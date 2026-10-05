@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AZAL SHOP | أزل</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:#fbfdff;
+  color:#102b4e;
+}
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#fff;
+  border-bottom:1px solid #e5edf6;
+  padding:14px 5%;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.logo{
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:#1261a8;
+  white-space:nowrap;
+}
+.logo small{
+  display:block;
+  text-align:center;
+  font-size:10px;
+  letter-spacing:5px;
+  color:#7890aa;
+}
+.search{
+  flex:1;
+  max-width:550px;
+  border:1px solid #d8e5f2;
+  background:#f7fbff;
+  border-radius:30px;
+  padding:12px 18px;
+  outline:none;
+}
+.btn{
+  border:0;
+  background:#1261a8;
+  color:#fff;
+  border-radius:25px;
+  padding:12px 18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+.hero{
+  min-height:390px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:50px 20px;
+  background:linear-gradient(135deg,#e4f2ff,#fff 52%,#d7ebff);
+}
+.hero h1{
+  margin:5px 0;
+  font-size:clamp(50px,10vw,95px);
+  letter-spacing:7px;
+}
+.hero p{
+  color:#627a94;
+  font-size:18px;
+}
+.wrap{
+  max-width:1200px;
+  margin:auto;
+  padding:40px 20px;
+}
+.section-title{text-align:center;margin-bottom:20px}
+.section-title h2{font-size:30px;margin:6px}
+.section-title small{letter-spacing:2px;color:#66819d}
+.categories{
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  padding:8px 0 22px;
+}
+.category{
+  border:1px solid #d6e4f2;
+  background:#fff;
+  color:#183a5d;
+  border-radius:30px;
+  padding:10px 16px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.category.active{
+  background:#102b4e;
+  color:#fff;
+}
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:20px;
+}
+.card{
+  background:#fff;
+  border:1px solid #e3ebf4;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 8px 30px rgba(20,70,110,.06);
+}
+.card img{
+  width:100%;
+  aspect-ratio:1/1.15;
+  object-fit:cover;
+  display:block;
+  background:#edf5fc;
+}
+.product-info{padding:15px}
+.product-info h3{margin:0 0 8px;font-size:17px}
+.price{
+  font-size:21px;
+  font-weight:900;
+  color:#1261a8;
+  margin-bottom:6px;
+}
+.meta{
+  min-height:18px;
+  font-size:12px;
+  color:#74869a;
+  margin-bottom:12px;
+}
+.empty{
+  grid-column:1/-1;
+  text-align:center;
+  color:#73869b;
+  padding:55px 10px;
+}
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  background:rgba(0,0,0,.4);
+}
+.overlay.open{display:block}
+.cart{
+  position:absolute;
+  top:0;
+  left:0;
+  width:min(440px,95%);
+  height:100%;
+  overflow:auto;
+  background:#fff;
+  padding:22px;
+}
+.close{
+  border:0;
+  background:transparent;
+  font-size:30px;
+  cursor:pointer;
+}
+.cart-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 0;
+  border-bottom:1px solid #eee;
+}
+.cart-row img{
+  width:65px;
+  height:75px;
+  object-fit:cover;
+  border-radius:9px;
+}
+.cart-row .details{flex:1}
+.total{
+  font-size:22px;
+  font-weight:900;
+  margin:20px 0;
+}
+.checkout input,.checkout textarea{
+  display:block;
+  width:100%;
+  margin:8px 0;
+  padding:12px;
+  border:1px solid #d5e1ed;
+  border-radius:10px;
+  font-family:inherit;
+}
+.checkout textarea{min-height:80px;resize:vertical}
+.message{
+  margin-top:12px;
+  font-weight:bold;
+}
+footer{
+  margin-top:55px;
+  padding:38px 20px;
+  background:#102b4e;
+  color:#fff;
+  text-align:center;
+}
+footer h2{letter-spacing:3px}
+.admin-link{
+  display:inline-block;
+  margin-top:10px;
+  color:#dcecff;
+  font-size:12px;
+}
+@media(max-width:600px){
+  header{flex-wrap:wrap;padding:12px}
+  .logo{font-size:20px}
+  .search{order:3;flex-basis:100%;max-width:none}
+  .hero{min-height:300px}
+  .wrap{padding:28px 12px}
+  .products{grid-template-columns:repeat(2,1fr);gap:10px}
+  .product-info{padding:11px}
+  .card .btn{width:100%;padding:10px 5px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    AZAL SHOP
+    <small>أزل</small>
+  </div>
+
+  <input id="search" class="search" placeholder="ابحثي عن منتج...">
+
+  <button class="btn" onclick="openCart()">
+    السلة (<span id="cartCount">0</span>)
+  </button>
+</header>
+
+<section class="hero">
+  <div>
+    <small>YOUR STYLE, YOUR AZAL</small>
+    <h1>AZAL</h1>
+    <p>اختياراتك، تفاصيلك، وستايلك الخاص.</p>
+    <button class="btn" onclick="document.getElementById('shop').scrollIntoView()">
+      تسوّقي الآن
+    </button>
+  </div>
+</section>
+
+<main class="wrap" id="shop">
+
+  <div class="section-title">
+    <small>CURATED BY AZAL</small>
+    <h2>تسوّقي الأقسام</h2>
+  </div>
+
+  <div class="categories" id="categories"></div>
+
+  <div class="products" id="products">
+    <div class="empty">جاري تحميل المنتجات...</div>
+  </div>
+
+</main>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeCart()">
+
+  <div class="cart">
+
+    <button class="close" onclick="closeCart()">×</button>
+
+    <h2>سلة التسوق</h2>
+
+    <div id="cartItems"></div>
+
+    <div class="total">
+      الإجمالي:
+      <span id="total">0</span> ₪
+    </div>
+
+    <div class="checkout">
+
+      <h3>إتمام الطلب</h3>
+
+      <input id="customerName" placeholder="الاسم الكامل">
+
+      <input id="customerPhone" placeholder="رقم الهاتف">
+
+      <textarea id="customerAddress"
+      placeholder="المدينة والعنوان بالتفصيل"></textarea>
+
+      <textarea id="customerNotes"
+      placeholder="ملاحظات على الطلب - اختياري"></textarea>
+
+      <button class="btn" style="width:100%" onclick="checkout()">
+        تأكيد الطلب
+      </button>
+
+      <div class="message" id="message"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <h2>AZAL SHOP</h2>
+  <p>Every detail tells your story.</p>
+  <p>Soft. Simple. Azal.</p>
+
+  <small>© AZAL SHOP — جميع الحقوق محفوظة</small>
+
+  <br>
+
+  <a class="admin-link" href="admin.html">
+    إدارة المتجر
+  </a>
+</footer>
+
+<script>
+
+const SUPABASE_URL =
+"https://dyycupydbyqfpugtpwoa.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_hYQzWO6VYm_DI_lamIPtAA_Q0fU967k";
+
+const sb =
+supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const categoryList = [
+"الكل",
+"شالات",
+"مكملات حجاب",
+"ملابس صلاة",
+"إكسسوارات نسائية",
+"شنط وجزادين",
+"ساعات",
+"الهدايا",
+"عطور",
+"فيزون ستاتي",
+"قسم الأطفال",
+"القسم الشتوي"
+];
+
+let products = [];
+let currentCategory = "الكل";
+
+let cart =
+JSON.parse(localStorage.getItem("azal_cart") || "[]");
+
+function escapeHTML(value){
+  return String(value ?? "")
+  .replace(/[&<>"']/g,function(char){
+    return {
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[char];
+  });
+}
+
+async function loadProducts(){
+
+  const {data,error} =
+  await sb
+  .from("Azal shop")
+  .select("*")
+  .eq("active",true)
+  .order("id",{ascending:false});
+
+  if(error){
+    document.getElementById("products").innerHTML =
+    '<div class="empty">تعذر تحميل المنتجات حاليًا.</div>';
+    return;
+  }
+
+  products = data || [];
+
+  renderCategories();
+  renderProducts();
+}
+
+function renderCategories(){
+
+  document.getElementById("categories").innerHTML =
+  categoryList.map(category => `
+    <button
+      class="category ${category===currentCategory?"active":""}"
+      onclick="selectCategory('${category}')">
+      ${category}
+    </button>
+  `).join("");
+}
+
+function selectCategory(category){
+
+  currentCategory = category;
+
+  renderCategories();
+  renderProducts();
+}
+
+function renderProducts(){
+
+  const search =
+  document.getElementById("search")
+  .value.trim().toLowerCase();
+
+  const filtered =
+  products.filter(product => {
+
+    const categoryMatch =
+    currentCategory === "الكل" ||
+    product.category === currentCategory;
+
+    const text =
+    `${product.name || ""}
+     ${product.description || ""}
+     ${product.category || ""}
+     ${product.subcategory || ""}`.toLowerCase();
+
+    return categoryMatch &&
+    (!search || text.includes(search));
+  });
+
+  const container =
+  document.getElementById("products");
+
+  if(!filtered.length){
+
+    container.innerHTML =
+    '<div class="empty">ما فيه منتجات بهذا القسم حاليًا 🤍</div>';
+
+    return;
+  }
+
+  container.innerHTML =
+  filtered.map(product => {
+
+    const stock = Number(product.stock || 0);
+
+    return `
+    <article class="card">
+
+      <img
+      src="${escapeHTML(product.image_url || "")}"
+      alt="${escapeHTML(product.name || "منتج")}">
+
+      <div class="product-info">
+
+        <h3>${escapeHTML(product.name || "منتج")}</h3>
+
+        <div class="price">
+          ${Number(product.price || 0).toFixed(0)} ₪
+        </div>
+
+        <div class="meta">
+          ${product.subcategory
+          ? escapeHTML(product.subcategory) + " • "
+          : ""}
+          ${stock > 0 ? "متوفر" : "نفد المخزون"}
+        </div>
+
+        <button
+        class="btn"
+        ${stock <= 0 ? "disabled" : ""}
+        onclick="addToCart(${product.id})">
+          ${stock > 0 ? "أضيفي للسلة" : "غير متوفر"}
+        </button>
+
+      </div>
+
+    </article>
+    `;
+  }).join("");
+}
+
+function addToCart(id){
+
+  const product =
+  products.find(item => item.id === id);
+
+  if(!product) return;
+
+  const stock = Number(product.stock || 0);
+
+  if(stock <= 0) return;
+
+  const existing =
+  cart.find(item => item.id === id);
+
+  if(existing){
+
+    if(existing.qty < stock)
+      existing.qty++;
+
+  }else{
+
+    cart.push({
+      id:product.id,
+      name:product.name,
+      price:Number(product.price || 0),
+      image_url:product.image_url,
+      qty:1
+    });
+  }
+
+  saveCart();
+}
+
+function saveCart(){
+
+  localStorage.setItem(
+    "azal_cart",
+    JSON.stringify(cart)
+  );
+
+  document.getElementById("cartCount").textContent =
+  cart.reduce((sum,item) => sum + item.qty,0);
+
+  renderCart();
+}
+
+function renderCart(){
+
+  const container =
+  document.getElementById("cartItems");
+
+  if(!cart.length){
+
+    container.innerHTML =
+    "<p>السلة فارغة.</p>";
+
+  }else{
+
+    container.innerHTML =
+    cart.map((item,index) => `
+
+      <div class="cart-row">
+
+        <img
+        src="${escapeHTML(item.image_url || "")}">
+
+        <div class="details">
+
+          <b>${escapeHTML(item.name)}</b>
+
+          <br>
+
+          ${item.price} ₪ × ${item.qty}
+
+        </div>
+
+        <button
+        class="close"
+        onclick="removeFromCart(${index})">
+        ×
+        </button>
+
+      </div>
+
+    `).join("");
+  }
+
+  const total =
+  cart.reduce(
+    (sum,item) =>
+    sum + item.price * item.qty,
+    0
+  );
+
+  document.getElementById("total").textContent =
+  total.toFixed(0);
+}
+
+function removeFromCart(index){
+
+  cart.splice(index,1);
+
+  saveCart();
+}
+
+function openCart(){
+
+  document
+  .getElementById("overlay")
+  .classList.add("open");
+
+  renderCart();
+}
+
+function closeCart(){
+
+  document
+  .getElementById("overlay")
+  .classList.remove("open");
+}
+
+async function checkout(){
+
+  const customer_name =
+  document.getElementById("customerName")
+  .value.trim();
+
+  const phone =
+  document.getElementById("customerPhone")
+  .value.trim();
+
+  const address =
+  document.getElementById("customerAddress")
+  .value.trim();
+
+  const notes =
+  document.getElementById("customerNotes")
+  .value.trim();
+
+  const message =
+  document.getElementById("message");
+
+  message.textContent = "";
+
+  if(!cart.length){
+
+    message.textContent =
+    "السلة فارغة.";
+
+    return;
+  }
+
+  if(!customer_name || !phone || !address){
+
+    message.textContent =
+    "عبّي الاسم ورقم الهاتف والعنوان.";
+
+    return;
+  }
+
+  const total =
+  cart.reduce(
+    (sum,item) =>
+    sum + item.price * item.qty,
+    0
+  );
+
+  const {data,error} =
+  await sb
+  .from("orders")
+  .insert({
+    customer_name,
+    phone,
+    address,
+    notes,
+    items:cart,
+    total,
+    status:"new"
+  })
+  .select("id")
+  .single();
+
+  if(error){
+
+    console.error(error);
+
+    message.textContent =
+    "صار خطأ أثناء إرسال الطلب، حاولي مرة ثانية.";
+
+    return;
+  }
+
+  message.textContent =
+  `تم استلام طلبك بنجاح 🤍 رقم الطلب: ${data.id}`;
+
+  cart = [];
+
+  saveCart();
+
+  document.getElementById("customerName").value="";
+  document.getElementById("customerPhone").value="";
+  document.getElementById("customerAddress").value="";
+  document.getElementById("customerNotes").value="";
+}
+
+document
+.getElementById("search")
+.addEventListener("input",renderProducts);
+
+saveCart();
+loadProducts();
+
+</script>
+
+</body>
+</html>

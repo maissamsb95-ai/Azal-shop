@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>إدارة AZAL SHOP</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:#f5f9fd;
+  color:#102b4e
+}
+header{
+  background:#102b4e;
+  color:white;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center
+}
+header h2{margin:0;letter-spacing:2px}
+button{
+  border:0;
+  padding:11px 17px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold
+}
+.primary{background:#1261a8;color:white}
+.danger{background:#b42318;color:white}
+.light{background:#e8f2fb;color:#123b61}
+.wrap{max-width:1150px;margin:auto;padding:25px}
+.box{
+  background:white;
+  padding:22px;
+  border-radius:16px;
+  box-shadow:0 5px 25px #1231;
+  margin-bottom:22px
+}
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  margin:6px 0 13px;
+  border:1px solid #ccdbe8;
+  border-radius:9px;
+  font-family:inherit
+}
+textarea{min-height:90px}
+label{font-size:14px;font-weight:bold}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px
+}
+.hidden{display:none!important}
+#login{
+  max-width:430px;
+  margin:70px auto
+}
+.msg{margin:12px 0;font-weight:bold}
+.product{
+  display:grid;
+  grid-template-columns:80px 1fr auto;
+  gap:15px;
+  align-items:center;
+  border-bottom:1px solid #eee;
+  padding:13px 0
+}
+.product img{
+  width:80px;height:90px;
+  object-fit:cover;
+  border-radius:9px;
+  background:#eee
+}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.order{
+  border:1px solid #e1e8ef;
+  padding:16px;
+  border-radius:12px;
+  margin:12px 0
+}
+.order h4{margin:0 0 8px}
+.tabs{display:flex;gap:8px;margin-bottom:20px}
+.tab.active{background:#102b4e;color:white}
+small{color:#718399}
+@media(max-width:700px){
+  .grid{grid-template-columns:1fr}
+  .product{grid-template-columns:60px 1fr}
+  .product img{width:60px;height:70px}
+  .actions{grid-column:1/-1}
+}
+</style>
+</head>
+
+<body>
+
+<div id="login" class="box">
+  <h1>AZAL SHOP</h1>
+  <h3>لوحة الإدارة</h3>
+
+  <label>البريد الإلكتروني</label>
+  <input id="email" type="email" value="maissamsb95@gmail.com">
+
+  <label>كلمة المرور</label>
+  <input id="password" type="password" placeholder="كلمة المرور">
+
+  <button class="primary" style="width:100%" onclick="login()">دخول</button>
+
+  <button class="light" style="width:100%;margin-top:8px" onclick="signup()">
+    إنشاء حساب الإدارة لأول مرة
+  </button>
+
+  <div id="loginMsg" class="msg"></div>
+</div>
+
+<div id="dashboard" class="hidden">
+
+<header>
+  <h2>AZAL SHOP • ADMIN</h2>
+  <button onclick="logout()">تسجيل خروج</button>
+</header>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button id="productsTab" class="tab active" onclick="showTab('products')">
+      المنتجات
+    </button>
+    <button id="ordersTab" class="tab" onclick="showTab('orders')">
+      الطلبات
+    </button>
+  </div>
+
+  <section id="productsSection">
+
+    <div class="box">
+      <h2 id="formTitle">إضافة منتج جديد</h2>
+
+      <input id="productId" type="hidden">
+
+      <div class="grid">
+
+        <div>
+          <label>اسم المنتج</label>
+          <input id="name">
+        </div>
+
+        <div>
+          <label>السعر ₪</label>
+          <input id="price" type="number" step="0.01">
+        </div>
+
+        <div>
+          <label>القسم</label>
+          <select id="category">
+            <option>شالات</option>
+            <option>مكملات حجاب</option>
+            <option>ملابس صلاة</option>
+            <option>إكسسوارات نسائية</option>
+            <option>شنط وجزادين</option>
+            <option>ساعات</option>
+            <option>الهدايا</option>
+            <option>عطور</option>
+            <option>فيزون ستاتي</option>
+            <option>قسم الأطفال</option>
+            <option>القسم الشتوي</option>
+          </select>
+        </div>
+
+        <div>
+          <label>القسم الفرعي</label>
+          <input id="subcategory" placeholder="مثال: مودال، شيفون...">
+        </div>
+
+        <div>
+          <label>الكمية المتوفرة</label>
+          <input id="stock" type="number" min="0" value="1">
+        </div>
+
+        <div>
+          <label>صورة المنتج</label>
+          <input id="image" type="file" accept="image/*">
+        </div>
+
+      </div>
+
+      <label>وصف المنتج</label>
+      <textarea id="description"></textarea>
+
+      <label>
+        <input id="active" type="checkbox" checked style="width:auto">
+        إظهار المنتج في المتجر
+      </label>
+
+      <br><br>
+
+      <button class="primary" onclick="saveProduct()">حفظ المنتج</button>
+      <button class="light" onclick="resetForm()">إلغاء / منتج جديد</button>
+
+      <div id="productMsg" class="msg"></div>
+    </div>
+
+    <div class="box">
+      <h2>المنتجات</h2>
+      <div id="products">جاري التحميل...</div>
+    </div>
+
+  </section>
+
+  <section id="ordersSection" class="hidden">
+    <div class="box">
+      <h2>طلبات الزبائن</h2>
+      <div id="orders">جاري التحميل...</div>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<script>
+const SUPABASE_URL="https://dyycupydbyqfpugtpwoa.supabase.co";
+const SUPABASE_KEY="sb_publishable_hYQzWO6VYm_DI_lamIPtAA_Q0fU967k";
+const OWNER_EMAIL="maissamsb95@gmail.com";
+
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let allProducts=[];
+let currentImageUrl="";
+
+function esc(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",
+ '"':"&quot;","'":"&#39;"
+ })[c]);
+}
+
+async function signup(){
+ const email=document.getElementById("email").value.trim().toLowerCase();
+ const password=document.getElementById("password").value;
+ const msg=document.getElementById("loginMsg");
+
+ if(email!==OWNER_EMAIL){
+   msg.textContent="هذا البريد غير مصرح له.";
+   return;
+ }
+
+ if(password.length<6){
+   msg.textContent="اختاري كلمة مرور من 6 خانات أو أكثر.";
+   return;
+ }
+
+ msg.textContent="جاري إنشاء الحساب...";
+
+ const {data,error}=await sb.auth.signUp({email,password});
+
+ if(error){
+   msg.textContent=error.message;
+   return;
+ }
+
+ if(data.session){
+   msg.textContent="تم إنشاء الحساب.";
+   await checkSession();
+ }else{
+   msg.textContent="تم إنشاء الحساب. افتحي رسالة التأكيد في بريدك ثم ارجعي وسجلي دخول.";
+ }
+}
+
+async function login(){
+ const email=document.getElementById("email").value.trim().toLowerCase();
+ const password=document.getElementById("password").value;
+ const msg=document.getElementById("loginMsg");
+
+ if(email!==OWNER_EMAIL){
+   msg.textContent="هذا البريد غير مصرح له.";
+   return;
+ }
+
+ msg.textContent="جاري الدخول...";
+
+ const {error}=await sb.auth.signInWithPassword({email,password});
+
+ if(error){
+   msg.textContent="البريد أو كلمة المرور غير صحيحة.";
+   return;
+ }
+
+ await checkSession();
+}
+
+async function checkSession(){
+ const {data:{session}}=await sb.auth.getSession();
+
+ if(!session){
+   document.getElementById("login").classList.remove("hidden");
+   document.getElementById("dashboard").classList.add("hidden");
+   return;
+ }
+
+ if((session.user.email||"").toLowerCase()!==OWNER_EMAIL){
+   await sb.auth.signOut();
+   document.getElementById("loginMsg").textContent="غير مصرح بالدخول.";
+   return;
+ }
+
+ const {data,error}=await sb
+ .from("admin_users")
+ .select("user_id")
+ .eq("user_id",session.user.id)
+ .maybeSingle();
+
+ if(error||!data){
+   document.getElementById("loginMsg").textContent="الحساب غير مخول للإدارة.";
+   await sb.auth.signOut();
+   return;
+ }
+
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("dashboard").classList.remove("hidden");
+
+ await loadProducts();
+ await loadOrders();
+}
+
+async function logout(){
+ await sb.auth.signOut();
+ location.reload();
+}
+
+function showTab(tab){
+ const p=tab==="products";
+
+ document.getElementById("productsSection").classList.toggle("hidden",!p);
+ document.getElementById("ordersSection").classList.toggle("hidden",p);
+
+ document.getElementById("productsTab").classList.toggle("active",p);
+ document.getElementById("ordersTab").classList.toggle("active",!p);
+
+ if(!p) loadOrders();
+}
+
+async function loadProducts(){
+ const box=document.getElementById("products");
+
+ const {data,error}=await sb
+ .from("Azal shop")
+ .select("*")
+ .order("id",{ascending:false});
+
+ if(error){
+   box.textContent="تعذر تحميل المنتجات.";
+   return;
+ }
+
+ allProducts=data||[];
+
+ if(!allProducts.length){
+   box.innerHTML="<p>ما فيه منتجات بعد.</p>";
+   return;
+ }
+
+ box.innerHTML=allProducts.map(p=>`
+ <div class="product">
+   <img src="${esc(p.image_url||"")}" alt="">
+   <div>
+     <b>${esc(p.name)}</b><br>
+     <span>${Number(p.price||0)} ₪</span><br>
+     <small>
+       ${esc(p.category||"بدون قسم")}
+       ${p.subcategory?" • "+esc(p.subcategory):""}
+       • المخزون: ${Number(p.stock||0)}
+       ${p.active===false?" • مخفي":""}
+     </small>
+   </div>
+
+   <div class="actions">
+     <button class="light" onclick="editProduct(${p.id})">تعديل</button>
+     <button class="danger" onclick="deleteProduct(${p.id})">حذف</button>
+   </div>
+ </div>
+ `).join("");
+}
+
+function editProduct(id){
+ const p=allProducts.find(x=>x.id===id);
+ if(!p)return;
+
+ document.getElementById("productId").value=p.id;
+ document.getElementById("name").value=p.name||"";
+ document.getElementById("price").value=p.price??"";
+ document.getElementById("category").value=p.category||"شالات";
+ document.getElementById("subcategory").value=p.subcategory||"";
+ document.getElementById("stock").value=p.stock??0;
+ document.getElementById("description").value=p.description||"";
+ document.getElementById("active").checked=p.active!==false;
+
+ currentImageUrl=p.image_url||"";
+
+ document.getElementById("formTitle").textContent="تعديل المنتج";
+ document.getElementById("productMsg").textContent="";
+
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function resetForm(){
+ document.getElementById("productId").value="";
+ document.getElementById("name").value="";
+ document.getElementById("price").value="";
+ document.getElementById("subcategory").value="";
+ document.getElementById("stock").value="1";
+ document.getElementById("description").value="";
+ document.getElementById("image").value="";
+ document.getElementById("active").checked=true;
+
+ currentImageUrl="";
+
+ document.getElementById("formTitle").textContent="إضافة منتج جديد";
+ document.getElementById("productMsg").textContent="";
+}
+
+async function uploadImage(){
+ const file=document.getElementById("image").files[0];
+
+ if(!file)return currentImageUrl;
+
+ const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
+ const path=`products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+ const {error}=await sb.storage
+ .from("products-images")
+ .upload(path,file,{
+   cacheControl:"3600",
+   upsert:false
+ });
+
+ if(error)throw error;
+
+ const {data}=sb.storage
+ .from("products-images")
+ .getPublicUrl(path);
+
+ return data.publicUrl;
+}
+
+async function saveProduct(){
+ const msg=document.getElementById("productMsg");
+ const id=document.getElementById("productId").value;
+ const name=document.getElementById("name").value.trim();
+ const price=Number(document.getElementById("price").value);
+ const stock=Number(document.getElementById("stock").value);
+
+ if(!name||!Number.isFinite(price)||price<0){
+   msg.textContent="اكتبي اسم المنتج والسعر بشكل صحيح.";
+   return;
+ }
+
+ msg.textContent="جاري الحفظ...";
+
+ try{
+   const image_url=await uploadImage();
+
+   if(!image_url){
+     msg.textContent="اختاري صورة للمنتج.";
+     return;
+   }
+
+   const product={
+     name,
+     price,
+     image_url,
+     description:document.getElementById("description").value.trim(),
+     category:document.getElementById("category").value,
+     subcategory:document.getElementById("subcategory").value.trim(),
+     stock:Number.isFinite(stock)&&stock>=0?stock:0,
+     active:document.getElementById("active").checked
+   };
+
+   let result;
+
+   if(id){
+     result=await sb
+     .from("Azal shop")
+     .update(product)
+     .eq("id",Number(id));
+   }else{
+     result=await sb
+     .from("Azal shop")
+     .insert(product);
+   }
+
+   if(result.error)throw result.error;
+
+   msg.textContent="تم حفظ المنتج بنجاح ✓";
+   resetForm();
+   await loadProducts();
+
+ }catch(e){
+   console.error(e);
+   msg.textContent="تعذر حفظ المنتج: "+e.message;
+ }
+}
+
+async function deleteProduct(id){
+ if(!confirm("متأكدة من حذف المنتج؟"))return;
+
+ const {error}=await sb
+ .from("Azal shop")
+ .delete()
+ .eq("id",id);
+
+ if(error){
+   alert("تعذر حذف المنتج.");
+   return;
+ }
+
+ await loadProducts();
+}
+
+async function loadOrders(){
+ const box=document.getElementById("orders");
+
+ const {data,error}=await sb
+ .from("orders")
+ .select("*")
+ .order("created_at",{ascending:false});
+
+ if(error){
+   box.textContent="تعذر تحميل الطلبات.";
+   return;
+ }
+
+ if(!data?.length){
+   box.innerHTML="<p>ما فيه طلبات حاليًا.</p>";
+   return;
+ }
+
+ box.innerHTML=data.map(o=>{
+
+   const items=Array.isArray(o.items)?o.items:[];
+
+   const itemText=items.map(i=>
+     `${esc(i.name)} × ${Number(i.qty||1)}`
+   ).join("<br>");
+
+   return `
+   <div class="order">
+     <h4>طلب #${o.id}</h4>
+
+     <b>${esc(o.customer_name)}</b><br>
+     📞 ${esc(o.phone)}<br>
+     📍 ${esc(o.address)}<br><br>
+
+     ${itemText||"لا توجد تفاصيل منتجات"}
+
+     <br><br>
+     <b>الإجمالي: ${Number(o.total||0)} ₪</b>
+
+     ${o.notes?`<p>ملاحظات: ${esc(o.notes)}</p>`:""}
+
+     <label>حالة الطلب</label>
+
+     <select onchange="changeStatus(${o.id},this.value)">
+       ${statusOptions(o.status)}
+     </select>
+
+     <small>
+       ${new Date(o.created_at).toLocaleString("ar")}
+     </small>
+   </div>`;
+ }).join("");
+}
+
+function statusOptions(current){
+ const statuses=[
+   ["new","جديد"],
+   ["confirmed","تم التأكيد"],
+   ["preparing","قيد التجهيز"],
+   ["shipped","تم الشحن"],
+   ["completed","مكتمل"],
+   ["cancelled","ملغي"]
+ ];
+
+ return statuses.map(([v,t])=>
+ `<option value="${v}" ${v===current?"selected":""}>${t}</option>`
+ ).join("");
+}
+
+async function changeStatus(id,status){
+ const {error}=await sb
+ .from("orders")
+ .update({status})
+ .eq("id",id);
+
+ if(error)alert("تعذر تحديث حالة الطلب.");
+}
+
+sb.auth.onAuthStateChange(()=>{
+ setTimeout(checkSession,0);
+});
+
+checkSession();
+</script>
+
+</body>
+</html>

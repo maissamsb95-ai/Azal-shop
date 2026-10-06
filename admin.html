@@ -4,603 +4,1057 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>إدارة AZAL SHOP</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Arial,Tahoma,sans-serif;
-  background:#f5f9fd;
-  color:#102b4e
+  font-family:Arial,sans-serif;
+  background:#f4f8fc;
+  color:#20364b
 }
-header{
-  background:#102b4e;
-  color:white;
-  padding:20px;
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+
+.login-page{
+  min-height:100vh;
   display:flex;
-  justify-content:space-between;
-  align-items:center
+  align-items:center;
+  justify-content:center;
+  padding:20px
 }
-header h2{margin:0;letter-spacing:2px}
-button{
-  border:0;
-  padding:11px 17px;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:bold
-}
-.primary{background:#1261a8;color:white}
-.danger{background:#b42318;color:white}
-.light{background:#e8f2fb;color:#123b61}
-.wrap{max-width:1150px;margin:auto;padding:25px}
-.box{
+.login-card{
   background:white;
-  padding:22px;
-  border-radius:16px;
-  box-shadow:0 5px 25px #1231;
-  margin-bottom:22px
+  width:min(440px,100%);
+  padding:38px;
+  border-radius:20px;
+  box-shadow:0 15px 50px #173a6320
 }
-input,textarea,select{
+.logo{
+  text-align:center;
+  color:#173a63;
+  font-size:31px;
+  font-weight:800;
+  letter-spacing:3px
+}
+.login-card h3{text-align:center;margin:12px 0 30px}
+label{display:block;margin:12px 0 6px;font-size:13px}
+input,select,textarea{
   width:100%;
   padding:12px;
-  margin:6px 0 13px;
-  border:1px solid #ccdbe8;
-  border-radius:9px;
-  font-family:inherit
+  border:1px solid #d5e0ea;
+  border-radius:8px;
+  outline:none;
+  background:#fff
 }
-textarea{min-height:90px}
-label{font-size:14px;font-weight:bold}
+textarea{min-height:90px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:#3975ad}
+
+.btn{
+  border:0;
+  background:#2d6da8;
+  color:white;
+  padding:12px 20px;
+  border-radius:8px;
+  font-weight:700
+}
+.btn.full{width:100%;margin-top:16px}
+.btn.red{background:#a94d4d}
+.btn.gray{background:#72869a}
+.btn.green{background:#347a5b}
+.msg{margin-top:15px;text-align:center;font-size:13px}
+
+.dashboard{display:none}
+
+.top{
+  background:#173a63;
+  color:white;
+  padding:16px 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px
+}
+.top h2{margin:0;letter-spacing:2px}
+.top button{
+  border:1px solid #ffffff55;
+  background:transparent;
+  color:white;
+  padding:8px 15px;
+  border-radius:6px
+}
+
+.container{
+  max-width:1250px;
+  margin:auto;
+  padding:25px
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:25px
+}
+.tab{
+  border:0;
+  background:#e3edf6;
+  color:#173a63;
+  padding:12px 22px;
+  border-radius:8px;
+  font-weight:bold
+}
+.tab.active{background:#173a63;color:white}
+
+.panel{display:none}
+.panel.active{display:block}
+
+.card{
+  background:white;
+  border-radius:14px;
+  padding:22px;
+  box-shadow:0 5px 25px #173a6312;
+  margin-bottom:22px
+}
+
+.card h3{margin-top:0;color:#173a63}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:15px
+  gap:13px
 }
-.hidden{display:none!important}
-#login{
-  max-width:430px;
-  margin:70px auto
-}
-.msg{margin:12px 0;font-weight:bold}
-.product{
-  display:grid;
-  grid-template-columns:80px 1fr auto;
-  gap:15px;
+.full-col{grid-column:1/-1}
+
+.check{
+  display:flex;
   align-items:center;
-  border-bottom:1px solid #eee;
-  padding:13px 0
-}
-.product img{
-  width:80px;height:90px;
-  object-fit:cover;
-  border-radius:9px;
-  background:#eee
-}
-.actions{display:flex;gap:7px;flex-wrap:wrap}
-.order{
-  border:1px solid #e1e8ef;
-  padding:16px;
-  border-radius:12px;
+  gap:8px;
   margin:12px 0
 }
-.order h4{margin:0 0 8px}
-.tabs{display:flex;gap:8px;margin-bottom:20px}
-.tab.active{background:#102b4e;color:white}
-small{color:#718399}
-@media(max-width:700px){
-  .grid{grid-template-columns:1fr}
-  .product{grid-template-columns:60px 1fr}
-  .product img{width:60px;height:70px}
-  .actions{grid-column:1/-1}
+.check input{width:auto}
+
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px
+}
+.product-card{
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid #e1e9f0
+}
+.product-card img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  background:#edf3f8
+}
+.product-info{padding:13px}
+.product-info h4{margin:0 0 7px}
+.price{font-weight:bold;color:#173a63}
+.muted{color:#7c8d9c;font-size:12px}
+.actions{
+  display:flex;
+  gap:6px;
+  margin-top:10px
+}
+.actions button{
+  flex:1;
+  padding:8px 4px;
+  border:0;
+  border-radius:6px;
+  color:white
+}
+.edit{background:#3477ad}
+.delete{background:#aa5151}
+
+.order{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  border:1px solid #e1e9f0;
+  margin-bottom:14px
+}
+.order-head{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:12px
+}
+.order-items{
+  background:#f5f8fb;
+  padding:12px;
+  border-radius:8px;
+  margin:12px 0;
+  font-size:13px
+}
+.status-row{
+  display:flex;
+  gap:8px
+}
+.status-row select{max-width:220px}
+
+.loading{text-align:center;padding:35px;color:#74889b}
+
+@media(max-width:850px){
+ .products-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+ .grid{grid-template-columns:1fr}
+ .full-col{grid-column:auto}
+ .container{padding:12px}
+ .products-grid{grid-template-columns:repeat(2,1fr)}
+ .top{padding:13px}
+ .top h2{font-size:17px}
 }
 </style>
 </head>
 
 <body>
 
-<div id="login" class="box">
-  <h1>AZAL SHOP</h1>
-  <h3>لوحة الإدارة</h3>
+<section class="login-page" id="loginPage">
+  <div class="login-card">
 
-  <label>البريد الإلكتروني</label>
-  <input id="email" type="email" value="maissamsb95@gmail.com">
+    <div class="logo">AZAL SHOP</div>
+    <h3>لوحة الإدارة</h3>
 
-  <label>كلمة المرور</label>
-  <input id="password" type="password" placeholder="كلمة المرور">
+    <label>البريد الإلكتروني</label>
+    <input id="email"
+           type="email"
+           value="maissamsb95@gmail.com"
+           readonly>
 
-  <button class="primary" style="width:100%" onclick="login()">دخول</button>
+    <label>كلمة المرور</label>
+    <input id="password"
+           type="password"
+           placeholder="كلمة المرور">
 
-  <button class="light" style="width:100%;margin-top:8px" onclick="signup()">
-    إنشاء حساب الإدارة لأول مرة
-  </button>
-
-  <div id="loginMsg" class="msg"></div>
-</div>
-
-<div id="dashboard" class="hidden">
-
-<header>
-  <h2>AZAL SHOP • ADMIN</h2>
-  <button onclick="logout()">تسجيل خروج</button>
-</header>
-
-<div class="wrap">
-
-  <div class="tabs">
-    <button id="productsTab" class="tab active" onclick="showTab('products')">
-      المنتجات
+    <button class="btn full" onclick="login()">
+      دخول
     </button>
-    <button id="ordersTab" class="tab" onclick="showTab('orders')">
-      الطلبات
-    </button>
+
+    <div class="msg" id="loginMsg"></div>
+
+  </div>
+</section>
+
+
+<section class="dashboard" id="dashboard">
+
+  <div class="top">
+    <h2>AZAL SHOP — الإدارة</h2>
+    <button onclick="logout()">تسجيل الخروج</button>
   </div>
 
-  <section id="productsSection">
+  <div class="container">
 
-    <div class="box">
-      <h2 id="formTitle">إضافة منتج جديد</h2>
+    <div class="tabs">
+      <button class="tab active"
+              onclick="showTab('productsPanel',this)">
+        المنتجات
+      </button>
 
-      <input id="productId" type="hidden">
+      <button class="tab"
+              onclick="showTab('ordersPanel',this)">
+        الطلبات
+      </button>
+    </div>
 
-      <div class="grid">
 
-        <div>
-          <label>اسم المنتج</label>
-          <input id="name">
+    <section class="panel active" id="productsPanel">
+
+      <div class="card">
+
+        <h3 id="formTitle">إضافة منتج جديد</h3>
+
+        <input type="hidden" id="productId">
+
+        <div class="grid">
+
+          <div>
+            <label>اسم المنتج</label>
+            <input id="productName"
+                   placeholder="مثال: شال مودال الغزال">
+          </div>
+
+          <div>
+            <label>السعر ₪</label>
+            <input id="productPrice"
+                   type="number"
+                   step="0.01"
+                   placeholder="20">
+          </div>
+
+          <div>
+            <label>القسم</label>
+            <select id="productCategory">
+              <option>شالات</option>
+              <option>مكملات حجاب</option>
+              <option>ملابس صلاة</option>
+              <option>إكسسوارات نسائية</option>
+              <option>شنط وجزادين</option>
+              <option>ساعات</option>
+              <option>الهدايا</option>
+              <option>عطور</option>
+              <option>فيزون ستاتي</option>
+              <option>قسم الأطفال</option>
+              <option>القسم الشتوي</option>
+            </select>
+          </div>
+
+          <div>
+            <label>القسم الفرعي</label>
+            <input id="productSubcategory"
+                   placeholder="مثال: مودال">
+          </div>
+
+          <div>
+            <label>المخزون</label>
+            <input id="productStock"
+                   type="number"
+                   min="0"
+                   value="1">
+          </div>
+
+          <div>
+            <label>صورة المنتج</label>
+            <input id="productImage"
+                   type="file"
+                   accept="image/*">
+          </div>
+
+          <div class="full-col">
+            <label>رابط الصورة الحالي / اختياري</label>
+            <input id="productImageUrl"
+                   placeholder="يظهر تلقائياً عند تعديل منتج">
+          </div>
+
+          <div class="full-col">
+            <label>الوصف</label>
+            <textarea id="productDescription"
+                      placeholder="وصف المنتج..."></textarea>
+          </div>
+
         </div>
 
-        <div>
-          <label>السعر ₪</label>
-          <input id="price" type="number" step="0.01">
-        </div>
+        <label class="check">
+          <input id="productActive"
+                 type="checkbox"
+                 checked>
+          المنتج ظاهر في المتجر
+        </label>
 
-        <div>
-          <label>القسم</label>
-          <select id="category">
-            <option>شالات</option>
-            <option>مكملات حجاب</option>
-            <option>ملابس صلاة</option>
-            <option>إكسسوارات نسائية</option>
-            <option>شنط وجزادين</option>
-            <option>ساعات</option>
-            <option>الهدايا</option>
-            <option>عطور</option>
-            <option>فيزون ستاتي</option>
-            <option>قسم الأطفال</option>
-            <option>القسم الشتوي</option>
-          </select>
-        </div>
+        <button class="btn"
+                id="saveBtn"
+                onclick="saveProduct()">
+          حفظ المنتج
+        </button>
 
-        <div>
-          <label>القسم الفرعي</label>
-          <input id="subcategory" placeholder="مثال: مودال، شيفون...">
-        </div>
+        <button class="btn gray"
+                onclick="resetForm()">
+          إلغاء / منتج جديد
+        </button>
 
-        <div>
-          <label>الكمية المتوفرة</label>
-          <input id="stock" type="number" min="0" value="1">
-        </div>
-
-        <div>
-          <label>صورة المنتج</label>
-          <input id="image" type="file" accept="image/*">
-        </div>
+        <div class="msg" id="productMsg"></div>
 
       </div>
 
-      <label>وصف المنتج</label>
-      <textarea id="description"></textarea>
 
-      <label>
-        <input id="active" type="checkbox" checked style="width:auto">
-        إظهار المنتج في المتجر
-      </label>
+      <div class="card">
+        <h3>منتجات المتجر</h3>
 
-      <br><br>
+        <div id="productsList"
+             class="products-grid">
+          <div class="loading">جاري التحميل...</div>
+        </div>
+      </div>
 
-      <button class="primary" onclick="saveProduct()">حفظ المنتج</button>
-      <button class="light" onclick="resetForm()">إلغاء / منتج جديد</button>
+    </section>
 
-      <div id="productMsg" class="msg"></div>
-    </div>
 
-    <div class="box">
-      <h2>المنتجات</h2>
-      <div id="products">جاري التحميل...</div>
-    </div>
+    <section class="panel" id="ordersPanel">
 
-  </section>
+      <div class="card">
+        <h3>طلبات العملاء</h3>
 
-  <section id="ordersSection" class="hidden">
-    <div class="box">
-      <h2>طلبات الزبائن</h2>
-      <div id="orders">جاري التحميل...</div>
-    </div>
-  </section>
+        <div id="ordersList">
+          <div class="loading">جاري تحميل الطلبات...</div>
+        </div>
+      </div>
 
-</div>
-</div>
+    </section>
+
+  </div>
+</section>
+
 
 <script>
-const SUPABASE_URL="https://dyycupydbyqfpugtpwoa.supabase.co";
-const SUPABASE_KEY="sb_publishable_hYQzWO6VYm_DI_lamIPtAA_Q0fU967k";
-const OWNER_EMAIL="maissamsb95@gmail.com";
+const SUPABASE_URL =
+"https://dyycupydbyqfpugtpwoa.supabase.co";
 
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SUPABASE_KEY =
+"sb_publishable_hYQzWO6VYm_DI_lamIPtAA_Q0fU967k";
 
-let allProducts=[];
-let currentImageUrl="";
+const OWNER_EMAIL = "maissamsb95@gmail.com";
 
-function esc(v){
- return String(v??"").replace(/[&<>"']/g,c=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",
- '"':"&quot;","'":"&#39;"
- })[c]);
-}
+const sb = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-async function signup(){
- const email=document.getElementById("email").value.trim().toLowerCase();
- const password=document.getElementById("password").value;
- const msg=document.getElementById("loginMsg");
+let products = [];
 
- if(email!==OWNER_EMAIL){
-   msg.textContent="هذا البريد غير مصرح له.";
-   return;
- }
 
- if(password.length<6){
-   msg.textContent="اختاري كلمة مرور من 6 خانات أو أكثر.";
-   return;
- }
-
- msg.textContent="جاري إنشاء الحساب...";
-
- const {data,error}=await sb.auth.signUp({email,password});
-
- if(error){
-   msg.textContent=error.message;
-   return;
- }
-
- if(data.session){
-   msg.textContent="تم إنشاء الحساب.";
-   await checkSession();
- }else{
-   msg.textContent="تم إنشاء الحساب. افتحي رسالة التأكيد في بريدك ثم ارجعي وسجلي دخول.";
- }
-}
+/* LOGIN */
 
 async function login(){
- const email=document.getElementById("email").value.trim().toLowerCase();
- const password=document.getElementById("password").value;
- const msg=document.getElementById("loginMsg");
 
- if(email!==OWNER_EMAIL){
-   msg.textContent="هذا البريد غير مصرح له.";
-   return;
- }
+  const email =
+    document.getElementById("email").value.trim().toLowerCase();
 
- msg.textContent="جاري الدخول...";
+  const password =
+    document.getElementById("password").value;
 
- const {error}=await sb.auth.signInWithPassword({email,password});
+  const msg =
+    document.getElementById("loginMsg");
 
- if(error){
-   msg.textContent="البريد أو كلمة المرور غير صحيحة.";
-   return;
- }
+  msg.textContent = "جاري تسجيل الدخول...";
 
- await checkSession();
+  if(email !== OWNER_EMAIL){
+    msg.textContent = "هذا الحساب غير مسموح له بالدخول.";
+    return;
+  }
+
+  const {data,error} =
+    await sb.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+    console.error(error);
+    msg.textContent = "البريد أو كلمة المرور غير صحيحة.";
+    return;
+  }
+
+  if(!data.user){
+    msg.textContent = "تعذر تسجيل الدخول.";
+    return;
+  }
+
+  const allowed = await verifyAdmin(data.user);
+
+  if(!allowed){
+    await sb.auth.signOut();
+    msg.textContent = "الحساب غير مخوّل للإدارة.";
+    return;
+  }
+
+  openDashboard();
 }
+
+
+async function verifyAdmin(user){
+
+  if(!user) return false;
+
+  if((user.email || "").toLowerCase() !== OWNER_EMAIL){
+    return false;
+  }
+
+  /*
+    IMPORTANT:
+    Instead of querying admin_users through the public API
+    and depending on its SELECT RLS policy, we verify that
+    this authenticated user is the fixed store-owner account.
+
+    Database RLS still protects product/order write actions.
+  */
+
+  return true;
+}
+
 
 async function checkSession(){
- const {data:{session}}=await sb.auth.getSession();
 
- if(!session){
-   document.getElementById("login").classList.remove("hidden");
-   document.getElementById("dashboard").classList.add("hidden");
-   return;
- }
+  const {data} = await sb.auth.getSession();
 
- if((session.user.email||"").toLowerCase()!==OWNER_EMAIL){
-   await sb.auth.signOut();
-   document.getElementById("loginMsg").textContent="غير مصرح بالدخول.";
-   return;
- }
+  const session = data.session;
 
- const {data,error}=await sb
- .from("admin_users")
- .select("user_id")
- .eq("user_id",session.user.id)
- .maybeSingle();
+  if(!session) return;
 
- if(error||!data){
-   document.getElementById("loginMsg").textContent="الحساب غير مخول للإدارة.";
-   await sb.auth.signOut();
-   return;
- }
+  const allowed =
+    await verifyAdmin(session.user);
 
- document.getElementById("login").classList.add("hidden");
- document.getElementById("dashboard").classList.remove("hidden");
-
- await loadProducts();
- await loadOrders();
+  if(allowed){
+    openDashboard();
+  }else{
+    await sb.auth.signOut();
+  }
 }
+
+
+function openDashboard(){
+
+  document.getElementById("loginPage").style.display="none";
+  document.getElementById("dashboard").style.display="block";
+
+  loadProducts();
+  loadOrders();
+}
+
 
 async function logout(){
- await sb.auth.signOut();
- location.reload();
+
+  await sb.auth.signOut();
+
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("loginPage").style.display="flex";
+  document.getElementById("password").value="";
+  document.getElementById("loginMsg").textContent="";
 }
 
-function showTab(tab){
- const p=tab==="products";
 
- document.getElementById("productsSection").classList.toggle("hidden",!p);
- document.getElementById("ordersSection").classList.toggle("hidden",p);
+/* TABS */
 
- document.getElementById("productsTab").classList.toggle("active",p);
- document.getElementById("ordersTab").classList.toggle("active",!p);
+function showTab(id,button){
 
- if(!p) loadOrders();
+  document.querySelectorAll(".panel")
+    .forEach(x=>x.classList.remove("active"));
+
+  document.querySelectorAll(".tab")
+    .forEach(x=>x.classList.remove("active"));
+
+  document.getElementById(id)
+    .classList.add("active");
+
+  button.classList.add("active");
+
+  if(id==="ordersPanel"){
+    loadOrders();
+  }
 }
+
+
+/* PRODUCTS */
 
 async function loadProducts(){
- const box=document.getElementById("products");
 
- const {data,error}=await sb
- .from("Azal shop")
- .select("*")
- .order("id",{ascending:false});
+  const box =
+    document.getElementById("productsList");
 
- if(error){
-   box.textContent="تعذر تحميل المنتجات.";
-   return;
- }
+  box.innerHTML =
+    '<div class="loading">جاري تحميل المنتجات...</div>';
 
- allProducts=data||[];
+  const {data,error} =
+    await sb
+      .from("Azal shop")
+      .select("*")
+      .order("id",{ascending:false});
 
- if(!allProducts.length){
-   box.innerHTML="<p>ما فيه منتجات بعد.</p>";
-   return;
- }
+  if(error){
+    console.error(error);
+    box.innerHTML =
+      '<div class="loading">تعذر تحميل المنتجات: '+escapeHTML(error.message)+'</div>';
+    return;
+  }
 
- box.innerHTML=allProducts.map(p=>`
- <div class="product">
-   <img src="${esc(p.image_url||"")}" alt="">
-   <div>
-     <b>${esc(p.name)}</b><br>
-     <span>${Number(p.price||0)} ₪</span><br>
-     <small>
-       ${esc(p.category||"بدون قسم")}
-       ${p.subcategory?" • "+esc(p.subcategory):""}
-       • المخزون: ${Number(p.stock||0)}
-       ${p.active===false?" • مخفي":""}
-     </small>
-   </div>
+  products = data || [];
 
-   <div class="actions">
-     <button class="light" onclick="editProduct(${p.id})">تعديل</button>
-     <button class="danger" onclick="deleteProduct(${p.id})">حذف</button>
-   </div>
- </div>
- `).join("");
+  renderProducts();
 }
+
+
+function renderProducts(){
+
+  const box =
+    document.getElementById("productsList");
+
+  if(!products.length){
+
+    box.innerHTML =
+      '<div class="loading">لا توجد منتجات حتى الآن.</div>';
+
+    return;
+  }
+
+  box.innerHTML =
+    products.map(p=>`
+
+      <article class="product-card">
+
+        ${
+          p.image_url
+          ? `<img src="${escapeHTML(p.image_url)}"
+                  alt="${escapeHTML(p.name||"")}">`
+          : `<div style="aspect-ratio:1/1;background:#edf3f8;display:grid;place-items:center;color:#8395a5">
+               بدون صورة
+             </div>`
+        }
+
+        <div class="product-info">
+
+          <h4>${escapeHTML(p.name||"بدون اسم")}</h4>
+
+          <div class="price">
+            ${Number(p.price||0).toFixed(0)} ₪
+          </div>
+
+          <div class="muted">
+            ${escapeHTML(p.category||"")}
+            ${p.subcategory ? " • "+escapeHTML(p.subcategory) : ""}
+          </div>
+
+          <div class="muted">
+            المخزون: ${Number(p.stock||0)}
+            •
+            ${p.active===false ? "مخفي" : "ظاهر"}
+          </div>
+
+          <div class="actions">
+
+            <button class="edit"
+                    onclick="editProduct(${Number(p.id)})">
+              تعديل
+            </button>
+
+            <button class="delete"
+                    onclick="deleteProduct(${Number(p.id)})">
+              حذف
+            </button>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    `).join("");
+}
+
 
 function editProduct(id){
- const p=allProducts.find(x=>x.id===id);
- if(!p)return;
 
- document.getElementById("productId").value=p.id;
- document.getElementById("name").value=p.name||"";
- document.getElementById("price").value=p.price??"";
- document.getElementById("category").value=p.category||"شالات";
- document.getElementById("subcategory").value=p.subcategory||"";
- document.getElementById("stock").value=p.stock??0;
- document.getElementById("description").value=p.description||"";
- document.getElementById("active").checked=p.active!==false;
+  const p =
+    products.find(x=>Number(x.id)===Number(id));
 
- currentImageUrl=p.image_url||"";
+  if(!p) return;
 
- document.getElementById("formTitle").textContent="تعديل المنتج";
- document.getElementById("productMsg").textContent="";
+  document.getElementById("productId").value = p.id;
+  document.getElementById("productName").value = p.name || "";
+  document.getElementById("productPrice").value = p.price ?? "";
+  document.getElementById("productCategory").value = p.category || "شالات";
+  document.getElementById("productSubcategory").value = p.subcategory || "";
+  document.getElementById("productStock").value = p.stock ?? 0;
+  document.getElementById("productImageUrl").value = p.image_url || "";
+  document.getElementById("productDescription").value = p.description || "";
+  document.getElementById("productActive").checked = p.active !== false;
 
- window.scrollTo({top:0,behavior:"smooth"});
+  document.getElementById("formTitle").textContent =
+    "تعديل المنتج";
+
+  document.getElementById("productMsg").textContent = "";
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
 }
+
 
 function resetForm(){
- document.getElementById("productId").value="";
- document.getElementById("name").value="";
- document.getElementById("price").value="";
- document.getElementById("subcategory").value="";
- document.getElementById("stock").value="1";
- document.getElementById("description").value="";
- document.getElementById("image").value="";
- document.getElementById("active").checked=true;
 
- currentImageUrl="";
+  document.getElementById("productId").value="";
+  document.getElementById("productName").value="";
+  document.getElementById("productPrice").value="";
+  document.getElementById("productCategory").value="شالات";
+  document.getElementById("productSubcategory").value="";
+  document.getElementById("productStock").value="1";
+  document.getElementById("productImage").value="";
+  document.getElementById("productImageUrl").value="";
+  document.getElementById("productDescription").value="";
+  document.getElementById("productActive").checked=true;
 
- document.getElementById("formTitle").textContent="إضافة منتج جديد";
- document.getElementById("productMsg").textContent="";
+  document.getElementById("formTitle").textContent =
+    "إضافة منتج جديد";
 }
 
-async function uploadImage(){
- const file=document.getElementById("image").files[0];
 
- if(!file)return currentImageUrl;
+async function uploadImage(file){
 
- const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
- const path=`products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  if(!file) return null;
 
- const {error}=await sb.storage
- .from("products-images")
- .upload(path,file,{
-   cacheControl:"3600",
-   upsert:false
- });
+  const extension =
+    file.name.split(".").pop() || "jpg";
 
- if(error)throw error;
+  const path =
+    "products/" +
+    Date.now() +
+    "-" +
+    Math.random().toString(36).slice(2) +
+    "." +
+    extension;
 
- const {data}=sb.storage
- .from("products-images")
- .getPublicUrl(path);
+  const {error} =
+    await sb.storage
+      .from("products-images")
+      .upload(path,file,{
+        cacheControl:"3600",
+        upsert:false
+      });
 
- return data.publicUrl;
+  if(error){
+    throw error;
+  }
+
+  const {data} =
+    sb.storage
+      .from("products-images")
+      .getPublicUrl(path);
+
+  return data.publicUrl;
 }
+
 
 async function saveProduct(){
- const msg=document.getElementById("productMsg");
- const id=document.getElementById("productId").value;
- const name=document.getElementById("name").value.trim();
- const price=Number(document.getElementById("price").value);
- const stock=Number(document.getElementById("stock").value);
 
- if(!name||!Number.isFinite(price)||price<0){
-   msg.textContent="اكتبي اسم المنتج والسعر بشكل صحيح.";
-   return;
- }
+  const msg =
+    document.getElementById("productMsg");
 
- msg.textContent="جاري الحفظ...";
+  const button =
+    document.getElementById("saveBtn");
 
- try{
-   const image_url=await uploadImage();
+  const id =
+    document.getElementById("productId").value;
 
-   if(!image_url){
-     msg.textContent="اختاري صورة للمنتج.";
-     return;
-   }
+  const name =
+    document.getElementById("productName").value.trim();
 
-   const product={
-     name,
-     price,
-     image_url,
-     description:document.getElementById("description").value.trim(),
-     category:document.getElementById("category").value,
-     subcategory:document.getElementById("subcategory").value.trim(),
-     stock:Number.isFinite(stock)&&stock>=0?stock:0,
-     active:document.getElementById("active").checked
-   };
+  const price =
+    Number(document.getElementById("productPrice").value);
 
-   let result;
+  const category =
+    document.getElementById("productCategory").value;
 
-   if(id){
-     result=await sb
-     .from("Azal shop")
-     .update(product)
-     .eq("id",Number(id));
-   }else{
-     result=await sb
-     .from("Azal shop")
-     .insert(product);
-   }
+  const subcategory =
+    document.getElementById("productSubcategory").value.trim();
 
-   if(result.error)throw result.error;
+  const stock =
+    Number(document.getElementById("productStock").value || 0);
 
-   msg.textContent="تم حفظ المنتج بنجاح ✓";
-   resetForm();
-   await loadProducts();
+  const description =
+    document.getElementById("productDescription").value.trim();
 
- }catch(e){
-   console.error(e);
-   msg.textContent="تعذر حفظ المنتج: "+e.message;
- }
+  const active =
+    document.getElementById("productActive").checked;
+
+  let image_url =
+    document.getElementById("productImageUrl").value.trim();
+
+  const file =
+    document.getElementById("productImage").files[0];
+
+  if(!name){
+    msg.textContent="اكتبي اسم المنتج.";
+    return;
+  }
+
+  if(!Number.isFinite(price) || price < 0){
+    msg.textContent="اكتبي سعر صحيح.";
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="جاري الحفظ...";
+  msg.textContent="";
+
+  try{
+
+    if(file){
+      image_url = await uploadImage(file);
+    }
+
+    const product = {
+      name,
+      price,
+      category,
+      subcategory,
+      stock,
+      description,
+      active,
+      image_url
+    };
+
+    let result;
+
+    if(id){
+
+      result =
+        await sb
+          .from("Azal shop")
+          .update(product)
+          .eq("id",id);
+
+    }else{
+
+      result =
+        await sb
+          .from("Azal shop")
+          .insert(product);
+
+    }
+
+    if(result.error){
+      throw result.error;
+    }
+
+    resetForm();
+
+    msg.textContent =
+      id
+      ? "تم تعديل المنتج بنجاح ✓"
+      : "تمت إضافة المنتج بنجاح ✓";
+
+    await loadProducts();
+
+  }catch(error){
+
+    console.error(error);
+
+    msg.textContent =
+      "صار خطأ: " + (error.message || "تعذر الحفظ");
+
+  }finally{
+
+    button.disabled=false;
+    button.textContent="حفظ المنتج";
+
+  }
 }
+
 
 async function deleteProduct(id){
- if(!confirm("متأكدة من حذف المنتج؟"))return;
 
- const {error}=await sb
- .from("Azal shop")
- .delete()
- .eq("id",id);
+  if(!confirm("متأكدة بدك تحذفي هذا المنتج؟")){
+    return;
+  }
 
- if(error){
-   alert("تعذر حذف المنتج.");
-   return;
- }
+  const {error} =
+    await sb
+      .from("Azal shop")
+      .delete()
+      .eq("id",id);
 
- await loadProducts();
+  if(error){
+    alert("تعذر حذف المنتج: "+error.message);
+    return;
+  }
+
+  await loadProducts();
 }
+
+
+/* ORDERS */
 
 async function loadOrders(){
- const box=document.getElementById("orders");
 
- const {data,error}=await sb
- .from("orders")
- .select("*")
- .order("created_at",{ascending:false});
+  const box =
+    document.getElementById("ordersList");
 
- if(error){
-   box.textContent="تعذر تحميل الطلبات.";
-   return;
- }
+  box.innerHTML =
+    '<div class="loading">جاري تحميل الطلبات...</div>';
 
- if(!data?.length){
-   box.innerHTML="<p>ما فيه طلبات حاليًا.</p>";
-   return;
- }
+  const {data,error} =
+    await sb
+      .from("orders")
+      .select("*")
+      .order("created_at",{ascending:false});
 
- box.innerHTML=data.map(o=>{
+  if(error){
 
-   const items=Array.isArray(o.items)?o.items:[];
+    console.error(error);
 
-   const itemText=items.map(i=>
-     `${esc(i.name)} × ${Number(i.qty||1)}`
-   ).join("<br>");
+    box.innerHTML =
+      '<div class="loading">تعذر تحميل الطلبات: '
+      + escapeHTML(error.message)
+      + '</div>';
 
-   return `
-   <div class="order">
-     <h4>طلب #${o.id}</h4>
+    return;
+  }
 
-     <b>${esc(o.customer_name)}</b><br>
-     📞 ${esc(o.phone)}<br>
-     📍 ${esc(o.address)}<br><br>
+  if(!data || !data.length){
 
-     ${itemText||"لا توجد تفاصيل منتجات"}
+    box.innerHTML =
+      '<div class="loading">لا توجد طلبات حتى الآن.</div>';
 
-     <br><br>
-     <b>الإجمالي: ${Number(o.total||0)} ₪</b>
+    return;
+  }
 
-     ${o.notes?`<p>ملاحظات: ${esc(o.notes)}</p>`:""}
+  box.innerHTML =
+    data.map(order=>{
 
-     <label>حالة الطلب</label>
+      let items = [];
 
-     <select onchange="changeStatus(${o.id},this.value)">
-       ${statusOptions(o.status)}
-     </select>
+      try{
+        items =
+          Array.isArray(order.items)
+          ? order.items
+          : JSON.parse(order.items || "[]");
+      }catch(e){}
 
-     <small>
-       ${new Date(o.created_at).toLocaleString("ar")}
-     </small>
-   </div>`;
- }).join("");
+      const itemsHTML =
+        items.map(item=>`
+          <div>
+            ${escapeHTML(item.name||"منتج")}
+            × ${Number(item.qty||1)}
+            — ${Number(item.price||0).toFixed(0)} ₪
+          </div>
+        `).join("");
+
+      return `
+
+        <div class="order">
+
+          <div class="order-head">
+
+            <div>
+              <strong>
+                طلب #${escapeHTML(order.id)}
+              </strong>
+
+              <div class="muted">
+                ${formatDate(order.created_at)}
+              </div>
+            </div>
+
+            <strong>
+              ${Number(order.total||0).toFixed(0)} ₪
+            </strong>
+
+          </div>
+
+          <div>
+            <b>العميلة:</b>
+            ${escapeHTML(order.customer_name||"")}
+          </div>
+
+          <div>
+            <b>الهاتف:</b>
+            ${escapeHTML(order.phone||"")}
+          </div>
+
+          <div>
+            <b>العنوان:</b>
+            ${escapeHTML(order.address||"")}
+          </div>
+
+          ${
+            order.notes
+            ? `<div><b>ملاحظات:</b> ${escapeHTML(order.notes)}</div>`
+            : ""
+          }
+
+          <div class="order-items">
+            ${itemsHTML || "لا توجد تفاصيل منتجات"}
+          </div>
+
+          <div class="status-row">
+
+            <select id="status-${escapeHTML(order.id)}">
+
+              ${statusOption("new","جديد",order.status)}
+              ${statusOption("confirmed","تم التأكيد",order.status)}
+              ${statusOption("preparing","قيد التجهيز",order.status)}
+              ${statusOption("shipped","تم الشحن",order.status)}
+              ${statusOption("completed","مكتمل",order.status)}
+              ${statusOption("cancelled","ملغي",order.status)}
+
+            </select>
+
+            <button class="btn green"
+              onclick="updateOrderStatus('${escapeJS(order.id)}')">
+              حفظ الحالة
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
 }
 
-function statusOptions(current){
- const statuses=[
-   ["new","جديد"],
-   ["confirmed","تم التأكيد"],
-   ["preparing","قيد التجهيز"],
-   ["shipped","تم الشحن"],
-   ["completed","مكتمل"],
-   ["cancelled","ملغي"]
- ];
 
- return statuses.map(([v,t])=>
- `<option value="${v}" ${v===current?"selected":""}>${t}</option>`
- ).join("");
+function statusOption(value,label,current){
+
+  return `
+    <option value="${value}"
+      ${current===value?"selected":""}>
+      ${label}
+    </option>
+  `;
 }
 
-async function changeStatus(id,status){
- const {error}=await sb
- .from("orders")
- .update({status})
- .eq("id",id);
 
- if(error)alert("تعذر تحديث حالة الطلب.");
+async function updateOrderStatus(id){
+
+  const status =
+    document.getElementById("status-"+id).value;
+
+  const {error} =
+    await sb
+      .from("orders")
+      .update({status})
+      .eq("id",id);
+
+  if(error){
+    alert("تعذر تحديث الطلب: "+error.message);
+    return;
+  }
+
+  alert("تم تحديث حالة الطلب ✓");
 }
 
-sb.auth.onAuthStateChange(()=>{
- setTimeout(checkSession,0);
-});
+
+/* HELPERS */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/[&<>"']/g,char=>({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    })[char]);
+}
+
+
+function escapeJS(value){
+
+  return String(value ?? "")
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'");
+}
+
+
+function formatDate(value){
+
+  if(!value) return "";
+
+  try{
+    return new Date(value)
+      .toLocaleString("ar");
+  }catch{
+    return value;
+  }
+}
+
 
 checkSession();
 </script>

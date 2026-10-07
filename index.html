@@ -1537,6 +1537,435 @@ saveCart();
 renderCategories();
 loadProducts();
 </script>
+<!-- ===== AZAL SHOP FINAL ENHANCEMENTS ===== -->
+<style>
+/* وصف المنتج */
+.product-description{
+  color:#6f8294;
+  font-size:12px;
+  line-height:1.8;
+  margin:7px 0 10px;
+  min-height:22px;
+}
 
+/* شكل أكثر حيوية للمنتجات */
+.product{
+  border:1px solid rgba(220,231,240,.85);
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(21,58,99,.06);
+  animation:azalRise .5s ease both;
+}
+
+.product-body{
+  padding:15px 13px 17px;
+}
+
+.product:hover{
+  transform:translateY(-8px);
+  box-shadow:0 20px 45px rgba(21,58,99,.14);
+}
+
+.category-card{
+  border-radius:15px;
+}
+
+.btn,.add{
+  border-radius:10px;
+}
+
+.add:hover{
+  transform:translateY(-2px);
+}
+
+.hero-copy,
+.section-title,
+.products-top{
+  animation:azalFade .65s ease both;
+}
+
+@keyframes azalFade{
+  from{
+    opacity:0;
+    transform:translateY(12px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes azalRise{
+  from{
+    opacity:0;
+    transform:translateY(16px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.qty button{
+  border-radius:7px;
+  font-weight:800;
+  color:#153a63;
+}
+
+.message.success-message{
+  background:#eef5fa;
+  border:1px solid #dce7f0;
+  padding:16px;
+  border-radius:12px;
+  line-height:2;
+  text-align:center;
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{
+    animation:none!important;
+    transition:none!important;
+  }
+}
+</style>
+
+<script>
+/* حذف القسمين */
+["فيزون ستاتي","القسم الشتوي"].forEach(cat=>{
+  const i=categoryList.indexOf(cat);
+  if(i>-1) categoryList.splice(i,1);
+});
+
+/* أيقونة أزل للمتصفح */
+(function(){
+  const favicon=document.createElement("link");
+  favicon.rel="icon";
+  favicon.type="image/svg+xml";
+  favicon.href=`data:image/svg+xml,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <rect width="100" height="100" rx="24" fill="%23f3f8fc"/>
+    <circle cx="50" cy="50" r="42"
+      fill="none" stroke="%23376b9d" stroke-width="4"/>
+    <text x="50" y="68" text-anchor="middle"
+      font-family="Georgia" font-size="58"
+      font-weight="700" fill="%23153a63">A</text>
+    <path d="M68 25c12-9 20-4 14 7-4 7-11 10-17 11
+             5-5 7-11 3-18zm-2 19c12 0 18 7 9 14
+             -6 5-13 3-18 0 5-2 8-7 9-14z"
+      fill="%238eb9da"/>
+  </svg>`;
+  document.head.appendChild(favicon);
+})();
+
+/* تحويل القلب العلوي إلى سلة */
+(function(){
+  const cartButton=document.querySelector(
+    '.header-actions.left .icon'
+  );
+
+  if(cartButton){
+    cartButton.innerHTML=`
+      <svg width="23" height="23"
+        viewBox="0 0 24 24"
+        fill="none" aria-hidden="true">
+
+        <path
+          d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9
+          a2 2 0 0 0 1.9-1.4L21 8H7"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+
+        <circle cx="10" cy="20" r="1.2"
+          fill="currentColor"/>
+
+        <circle cx="18" cy="20" r="1.2"
+          fill="currentColor"/>
+      </svg>
+
+      <span class="cart-count" id="cartCount">0</span>
+    `;
+  }
+})();
+
+/* عرض المنتجات + الوصف + إلغاء المخزون */
+renderProducts=function(){
+
+  const q=document
+    .getElementById("search")
+    .value.trim()
+    .toLowerCase();
+
+  const filtered=products.filter(p=>{
+
+    const categoryOK=
+      currentCategory==="الكل" ||
+      p.category===currentCategory;
+
+    const text=
+      `${p.name||""}
+       ${p.description||""}
+       ${p.category||""}
+       ${p.subcategory||""}`
+      .toLowerCase();
+
+    return categoryOK && (!q || text.includes(q));
+  });
+
+  document.getElementById("productsTitle").textContent=
+    currentCategory==="الكل"
+      ?"كل المنتجات"
+      :currentCategory;
+
+  document.getElementById("productsCount").textContent=
+    `${filtered.length} منتج`;
+
+  const box=document.getElementById("products");
+
+  if(!filtered.length){
+    box.innerHTML=
+      '<div class="empty">ما فيه منتجات بهذا القسم حاليًا 🤍</div>';
+    return;
+  }
+
+  box.innerHTML=filtered.map(p=>`
+
+    <article class="product">
+
+      <div class="product-image">
+
+        <img
+          src="${escapeHTML(p.image_url||"")}"
+          alt="${escapeHTML(p.name||"منتج")}"
+          loading="lazy"
+          onerror="this.style.opacity='.15'">
+
+        <span class="product-badge">
+          AZAL
+        </span>
+
+      </div>
+
+      <div class="product-body">
+
+        <div class="product-cat">
+          ${escapeHTML(
+            p.subcategory ||
+            p.category ||
+            "AZAL"
+          )}
+        </div>
+
+        <h3>
+          ${escapeHTML(p.name||"منتج")}
+        </h3>
+
+        ${
+          p.description
+          ?`
+          <div class="product-description">
+            ${escapeHTML(p.description)}
+          </div>
+          `
+          :""
+        }
+
+        <div class="price">
+          ${Number(p.price||0).toFixed(0)} ₪
+        </div>
+
+        <button
+          class="add"
+          onclick="addToCart(${Number(p.id)})">
+          أضيفي للسلة
+        </button>
+
+      </div>
+
+    </article>
+
+  `).join("");
+};
+
+
+/* إضافة للسلة بدون ربطها بالمخزون */
+addToCart=function(id){
+
+  const product=products.find(
+    p=>Number(p.id)===Number(id)
+  );
+
+  if(!product)return;
+
+  const existing=cart.find(
+    i=>Number(i.id)===Number(id)
+  );
+
+  if(existing){
+
+    existing.qty++;
+
+  }else{
+
+    cart.push({
+      id:product.id,
+      name:product.name,
+      price:Number(product.price||0),
+      image_url:product.image_url,
+      qty:1
+    });
+
+  }
+
+  saveCart();
+  showToast("تمت الإضافة للسلة 🛒");
+};
+
+
+/* + و - للكميات بدون مخزون */
+changeQty=function(index,amount){
+
+  const item=cart[index];
+
+  if(!item)return;
+
+  item.qty+=amount;
+
+  if(item.qty<=0){
+    cart.splice(index,1);
+  }
+
+  saveCart();
+};
+
+
+/* رسالة الشكر بعد نجاح الطلب */
+checkout=async function(){
+
+  const customer_name=
+    document.getElementById("customerName")
+    .value.trim();
+
+  const phone=
+    document.getElementById("customerPhone")
+    .value.trim();
+
+  const address=
+    document.getElementById("customerAddress")
+    .value.trim();
+
+  const notes=
+    document.getElementById("customerNotes")
+    .value.trim();
+
+  const message=
+    document.getElementById("message");
+
+  const button=
+    document.getElementById("checkoutBtn");
+
+  message.textContent="";
+  message.classList.remove("success-message");
+
+  if(!cart.length){
+
+    message.textContent=
+      "السلة فارغة.";
+
+    return;
+  }
+
+  if(!customer_name || !phone || !address){
+
+    message.textContent=
+      "عبّي الاسم ورقم الهاتف والعنوان.";
+
+    return;
+  }
+
+  const total=cart.reduce(
+    (sum,item)=>
+      sum+
+      Number(item.price)*item.qty,
+    0
+  );
+
+  button.disabled=true;
+  button.textContent=
+    "جاري إرسال الطلب...";
+
+  const {data,error}=await sb
+    .from("orders")
+    .insert({
+      customer_name,
+      phone,
+      address,
+      notes,
+      items:cart,
+      total,
+      status:"new"
+    })
+    .select("id")
+    .single();
+
+  button.disabled=false;
+  button.textContent="تأكيد الطلب";
+
+  if(error){
+
+    console.error(error);
+
+    message.textContent=
+      "صار خطأ أثناء إرسال الطلب، حاولي مرة ثانية.";
+
+    return;
+  }
+
+  message.classList.add("success-message");
+
+  message.innerHTML=`
+    شكرًا لاختيارك متجر
+    <strong>أزل</strong> 🤍
+    <br>
+    تم استلام طلبك بنجاح،
+    وسنتواصل معك لتأكيد الطلب.
+    <br>
+    رقم طلبك:
+    <strong>#${data.id}</strong>
+    <br>
+    نتمنى لك تجربة جميلة مع AZAL ✨
+  `;
+
+  cart=[];
+  saveCart();
+
+  document.getElementById(
+    "customerName"
+  ).value="";
+
+  document.getElementById(
+    "customerPhone"
+  ).value="";
+
+  document.getElementById(
+    "customerAddress"
+  ).value="";
+
+  document.getElementById(
+    "customerNotes"
+  ).value="";
+};
+
+
+/* تحديث الشكل بعد تحميل الصفحة */
+setTimeout(()=>{
+  renderCategories();
+  renderProducts();
+  saveCart();
+},700);
+
+</script>
+<!-- ===== END AZAL ENHANCEMENTS ===== -->
 </body>
 </html>

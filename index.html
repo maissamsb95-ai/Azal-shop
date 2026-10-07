@@ -1967,5 +1967,615 @@ setTimeout(()=>{
 
 </script>
 <!-- ===== END AZAL ENHANCEMENTS ===== -->
+  <!-- ===== AZAL LUXURY REDESIGN ===== -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,600&family=Cairo:wght@300;400;500;600;700;800&display=swap');
+
+:root{
+  --navy:#102f50;
+  --blue:#477ca8;
+  --powder:#dcecf7;
+  --ice:#f2f8fc;
+  --gold:#c6a76d;
+  --text:#17324a;
+  --muted:#71879a;
+  --line:#d9e8f2;
+  --shadow:0 18px 50px rgba(16,47,80,.12);
+}
+
+/* ===== خلفية الموقع ===== */
+body{
+  background:
+    radial-gradient(circle at 10% 15%,rgba(152,196,226,.10),transparent 25%),
+    radial-gradient(circle at 90% 55%,rgba(198,167,109,.06),transparent 25%),
+    #fcfeff;
+}
+
+/* ===== الشريط العلوي ===== */
+.topbar{
+  background:linear-gradient(90deg,#0d2946,#1e527d,#0d2946);
+  letter-spacing:.3px;
+  box-shadow:0 3px 15px rgba(16,47,80,.15);
+}
+
+/* ===== الهيدر ===== */
+header{
+  background:rgba(255,255,255,.91);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  box-shadow:0 7px 30px rgba(16,47,80,.055);
+}
+
+/* ===== شعار AZAL المزخرف ===== */
+.logo{
+  position:relative;
+  padding:7px 28px;
+}
+
+.logo-main{
+  position:relative;
+  font-family:"Cormorant Garamond",serif !important;
+  font-size:43px !important;
+  font-weight:600;
+  font-style:italic;
+  letter-spacing:9px !important;
+  color:#153e65 !important;
+  text-shadow:0 4px 16px rgba(40,91,135,.12);
+}
+
+.logo-main::before{
+  content:"✦";
+  position:absolute;
+  right:-20px;
+  top:-5px;
+  font-size:10px;
+  color:var(--gold);
+  animation:azalSparkle 2.4s ease-in-out infinite;
+}
+
+.logo-main::after{
+  content:"❧";
+  position:absolute;
+  left:-27px;
+  top:2px;
+  font-size:25px;
+  color:#7da7c7;
+  transform:rotate(-22deg);
+  opacity:.9;
+}
+
+.logo-tag{
+  color:#718ca3 !important;
+  letter-spacing:4px !important;
+  font-size:8px !important;
+  position:relative;
+}
+
+.logo-tag::before,
+.logo-tag::after{
+  content:"";
+  display:inline-block;
+  width:25px;
+  height:1px;
+  vertical-align:middle;
+  margin:0 9px;
+  background:linear-gradient(90deg,transparent,var(--gold));
+}
+
+.logo-tag::after{
+  background:linear-gradient(90deg,var(--gold),transparent);
+}
+
+/* ===== القائمة ===== */
+.navbar{
+  background:rgba(248,252,255,.72);
+}
+
+.navbar button{
+  position:relative;
+  padding:13px 2px;
+  font-weight:500;
+}
+
+.navbar button::after{
+  content:"";
+  position:absolute;
+  right:50%;
+  left:50%;
+  bottom:5px;
+  height:1px;
+  background:var(--blue);
+  transition:.3s;
+}
+
+.navbar button:hover::after{
+  right:0;
+  left:0;
+}
+
+/* ===== HERO الكبير ===== */
+.hero{
+  min-height:680px !important;
+  background:
+    radial-gradient(circle at 80% 18%,rgba(111,164,203,.32),transparent 27%),
+    radial-gradient(circle at 15% 78%,rgba(198,167,109,.10),transparent 22%),
+    linear-gradient(125deg,#ffffff 0%,#eef7fd 43%,#d9ebf7 100%) !important;
+}
+
+.hero::before{
+  width:650px !important;
+  height:650px !important;
+  border:1px solid rgba(65,118,158,.12) !important;
+  box-shadow:
+    0 0 0 50px rgba(255,255,255,.16),
+    0 0 0 100px rgba(255,255,255,.08);
+}
+
+.hero::after{
+  content:"AZAL" !important;
+  font-family:"Cormorant Garamond",serif !important;
+  font-style:italic;
+  font-size:260px !important;
+  color:rgba(20,62,99,.045) !important;
+}
+
+.hero-copy{
+  position:relative;
+}
+
+.hero-copy::before{
+  content:"✦  AZAL SIGNATURE  ✦";
+  color:#a18b63;
+  font-size:9px;
+  letter-spacing:4px;
+  display:block;
+  margin-bottom:12px;
+}
+
+.hero .kicker{
+  display:none;
+}
+
+.hero h1{
+  font-family:"Cormorant Garamond",serif !important;
+  font-style:italic;
+  font-weight:600;
+  font-size:clamp(95px,11vw,155px) !important;
+  letter-spacing:12px !important;
+  color:#143e63 !important;
+  text-shadow:0 12px 35px rgba(31,78,116,.13);
+  position:relative;
+  display:inline-block;
+}
+
+.hero h1::after{
+  content:"✦";
+  position:absolute;
+  left:-25px;
+  top:7px;
+  font-size:17px;
+  color:var(--gold);
+  animation:azalSparkle 2s infinite;
+}
+
+.hero h2{
+  font-size:31px !important;
+  font-weight:600 !important;
+  color:#274e6d !important;
+}
+
+.hero p{
+  font-size:14px;
+  color:#607d93 !important;
+}
+
+.btn-primary{
+  background:linear-gradient(135deg,#123958,#2e638c) !important;
+  border-radius:30px !important;
+  padding:15px 34px !important;
+  box-shadow:0 12px 30px rgba(18,57,88,.20);
+}
+
+.btn-primary:hover{
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 18px 35px rgba(18,57,88,.27);
+}
+
+/* ===== الأشكال بالواجهة ===== */
+.fabric{
+  box-shadow:
+    0 30px 70px rgba(24,65,98,.16),
+    inset 0 0 35px rgba(255,255,255,.35) !important;
+  animation:azalFloat 5s ease-in-out infinite;
+}
+
+.fabric.one{
+  background:linear-gradient(145deg,#b9d6e9,#f8fcff 48%,#8eb7d3) !important;
+}
+
+.fabric.two{
+  animation-delay:-1.5s;
+  background:linear-gradient(145deg,#7fa9c7,#eaf5fc 55%,#527f9f) !important;
+}
+
+.fabric.three{
+  animation-delay:-3s;
+}
+
+.floating-card{
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.9) !important;
+  box-shadow:0 20px 50px rgba(20,60,94,.15) !important;
+}
+
+/* ===== المميزات ===== */
+.perks{
+  border:0 !important;
+  box-shadow:0 12px 40px rgba(30,69,99,.07);
+  position:relative;
+  z-index:4;
+}
+
+.perk{
+  transition:.3s;
+}
+
+.perk:hover{
+  background:#f2f8fc;
+  transform:translateY(-3px);
+}
+
+.perk-icon{
+  color:#477ca8;
+  font-size:25px !important;
+}
+
+/* ===== العناوين ===== */
+.section-title .mini,
+.products-top small{
+  color:#a18b63 !important;
+  letter-spacing:4px;
+}
+
+.section-title h2,
+.products-top h2{
+  font-size:34px !important;
+  position:relative;
+  display:inline-block;
+}
+
+.section-title h2::after{
+  content:"";
+  display:block;
+  width:55px;
+  height:2px;
+  margin:12px auto 0;
+  background:linear-gradient(90deg,transparent,#477ca8,transparent);
+}
+
+/* ===== الأقسام ===== */
+.categories{
+  gap:18px !important;
+}
+
+.category-card{
+  min-height:185px !important;
+  border:1px solid rgba(201,220,234,.8) !important;
+  border-radius:22px !important;
+  background:
+    radial-gradient(circle at 10% 100%,rgba(90,143,182,.16),transparent 35%),
+    linear-gradient(145deg,#ffffff,#edf6fb) !important;
+  box-shadow:0 8px 30px rgba(20,61,93,.06);
+  transition:.35s !important;
+}
+
+.category-card::before{
+  content:"✦";
+  position:absolute;
+  left:20px;
+  top:18px;
+  color:#9ebbd0;
+  font-size:13px;
+}
+
+.category-card:hover{
+  transform:translateY(-9px) !important;
+  box-shadow:0 22px 45px rgba(20,61,93,.14) !important;
+}
+
+.category-card.active{
+  background:
+    radial-gradient(circle at 20% 100%,rgba(117,170,209,.35),transparent 38%),
+    linear-gradient(145deg,#102f50,#32678f) !important;
+}
+
+.category-card h3{
+  font-size:18px !important;
+}
+
+/* ===== بانر أزل ===== */
+.promo{
+  border-radius:28px;
+  min-height:330px !important;
+  background:
+    radial-gradient(circle at 85% 20%,rgba(130,181,218,.35),transparent 28%),
+    linear-gradient(120deg,#0c2a47,#1e527a 60%,#356f99) !important;
+  box-shadow:0 30px 60px rgba(15,48,75,.18);
+}
+
+.promo::before{
+  content:"✦";
+  position:absolute;
+  left:12%;
+  top:20%;
+  font-size:30px;
+  color:rgba(224,198,145,.6);
+  animation:azalSparkle 2s infinite;
+}
+
+.promo h2{
+  font-size:40px !important;
+}
+
+/* ===== المنتجات ===== */
+.products{
+  gap:25px !important;
+}
+
+.product{
+  background:#fff !important;
+  border-radius:22px !important;
+  border:1px solid rgba(210,226,238,.8) !important;
+  box-shadow:0 10px 35px rgba(21,58,99,.075) !important;
+  overflow:hidden;
+  transition:.4s cubic-bezier(.2,.8,.2,1) !important;
+}
+
+.product:hover{
+  transform:translateY(-11px) !important;
+  box-shadow:0 25px 55px rgba(21,58,99,.16) !important;
+}
+
+.product-image{
+  background:linear-gradient(145deg,#edf6fb,#dcecf6) !important;
+}
+
+.product-image img{
+  transition:.6s cubic-bezier(.2,.8,.2,1) !important;
+}
+
+.product:hover .product-image img{
+  transform:scale(1.07) !important;
+}
+
+.product-badge{
+  border-radius:20px !important;
+  padding:7px 12px !important;
+  backdrop-filter:blur(10px);
+  box-shadow:0 4px 15px rgba(20,58,90,.08);
+}
+
+.product-body{
+  padding:18px 16px 20px !important;
+}
+
+.product-cat{
+  color:#8da4b6 !important;
+  letter-spacing:.5px;
+}
+
+.product h3{
+  color:#173d5c;
+  font-size:16px !important;
+}
+
+.product-description{
+  border-right:2px solid #d5b77e;
+  padding-right:9px;
+  color:#73889a !important;
+}
+
+.price{
+  font-size:20px !important;
+}
+
+.add{
+  border-radius:25px !important;
+  padding:12px !important;
+  background:linear-gradient(135deg,#fff,#f6fbfe) !important;
+}
+
+.add:hover{
+  color:#fff !important;
+  background:linear-gradient(135deg,#123958,#32698f) !important;
+  transform:translateY(-2px);
+}
+
+/* ===== قصتنا ===== */
+.story{
+  background:
+    radial-gradient(circle at 50% 0,rgba(117,167,203,.18),transparent 35%),
+    linear-gradient(180deg,#f5faff,#edf6fb) !important;
+}
+
+.story h2{
+  font-family:"Cormorant Garamond",serif !important;
+  font-style:italic;
+  font-size:60px !important;
+  letter-spacing:10px !important;
+}
+
+/* ===== النشرة ===== */
+.newsletter{
+  background:#fff;
+  max-width:850px !important;
+  padding:45px !important;
+  border-radius:28px;
+  box-shadow:0 15px 50px rgba(21,58,99,.08);
+}
+
+/* ===== السلة ===== */
+.cart{
+  box-shadow:20px 0 60px rgba(5,27,45,.22);
+}
+
+.cart-head h2{
+  font-size:25px;
+}
+
+.cart-row{
+  border-radius:14px;
+  padding:13px !important;
+  margin:8px 0;
+  background:#f8fbfd;
+  border:1px solid #e4eef5 !important;
+}
+
+.qty button{
+  border-radius:50% !important;
+  color:#153a63;
+  transition:.2s;
+}
+
+.qty button:hover{
+  background:#153a63 !important;
+  color:#fff;
+}
+
+.total{
+  border-radius:15px;
+}
+
+/* ===== الفوتر ===== */
+footer{
+  background:
+    radial-gradient(circle at 80% 20%,rgba(83,139,181,.25),transparent 28%),
+    #0c2944 !important;
+}
+
+.footer-brand{
+  font-family:"Cormorant Garamond",serif !important;
+  font-style:italic;
+  font-size:40px !important;
+}
+
+/* ===== الحركات ===== */
+@keyframes azalFloat{
+  0%,100%{transform:translateY(0) rotate(-8deg)}
+  50%{transform:translateY(-13px) rotate(-5deg)}
+}
+
+@keyframes azalSparkle{
+  0%,100%{opacity:.35;transform:scale(.8)}
+  50%{opacity:1;transform:scale(1.25)}
+}
+
+/* ===== الجوال ===== */
+@media(max-width:700px){
+
+  .logo{
+    padding:4px 10px;
+  }
+
+  .logo-main{
+    font-size:31px !important;
+    letter-spacing:6px !important;
+  }
+
+  .logo-main::before{
+    right:-12px;
+  }
+
+  .logo-main::after{
+    left:-17px;
+    font-size:18px;
+  }
+
+  .logo-tag::before,
+  .logo-tag::after{
+    display:none;
+  }
+
+  .hero{
+    min-height:540px !important;
+  }
+
+  .hero-inner{
+    padding:75px 22px !important;
+  }
+
+  .hero h1{
+    font-size:93px !important;
+    letter-spacing:7px !important;
+  }
+
+  .hero h2{
+    font-size:24px !important;
+  }
+
+  .hero p{
+    font-size:13px;
+  }
+
+  .categories{
+    gap:11px !important;
+  }
+
+  .category-card{
+    min-height:145px !important;
+    border-radius:17px !important;
+  }
+
+  .category-card h3{
+    font-size:14px !important;
+  }
+
+  .products{
+    gap:12px !important;
+  }
+
+  .product{
+    border-radius:16px !important;
+  }
+
+  .product-body{
+    padding:13px 10px 15px !important;
+  }
+
+  .product h3{
+    font-size:13px !important;
+  }
+
+  .promo{
+    margin-left:12px;
+    margin-right:12px;
+    border-radius:20px;
+  }
+
+  .promo h2{
+    font-size:29px !important;
+  }
+
+  .newsletter{
+    margin:45px 12px !important;
+    padding:30px 18px !important;
+    border-radius:20px;
+  }
+}
+</style>
+
+<script>
+/* لمسة زخرفية لشعار AZAL */
+document.querySelectorAll(".logo-main").forEach(el=>{
+  el.setAttribute("title","AZAL • Your Style Your Azal");
+});
+
+/* تغيير رموز المميزات لشكل أنظف */
+const azalPerkIcons=["✦","♡","◇","✧"];
+document.querySelectorAll(".perk-icon").forEach((el,i)=>{
+  el.textContent=azalPerkIcons[i]||"✦";
+});
+</script>
+<!-- ===== END AZAL LUXURY REDESIGN ===== -->
 </body>
 </html>

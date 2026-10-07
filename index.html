@@ -3372,5 +3372,223 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 </script>
 
 <!-- ===== END AZAL SOFT GLASS BACKGROUND ===== -->
+  <!-- ===== AZAL HOME FEATURED PRODUCTS ===== -->
+
+<script>
+(function(){
+
+  /*
+    الرئيسية:
+    منتج واحد من كل قسم من الأقسام الأربعة.
+    عند فتح أي قسم: تظهر كل منتجات القسم كالمعتاد.
+    عند البحث: تظهر نتائج البحث كاملة.
+  */
+
+  const oldRenderProducts = renderProducts;
+
+  renderProducts = function(){
+
+    const searchInput = document.getElementById("search");
+
+    const q = searchInput
+      ? searchInput.value.trim().toLowerCase()
+      : "";
+
+    /*
+      إذا المستخدم داخل قسم معين
+      أو يبحث عن منتج:
+      نستخدم عرض المنتجات الطبيعي كاملًا.
+    */
+    if(currentCategory !== "الكل" || q){
+      oldRenderProducts();
+
+      if(currentCategory !== "الكل"){
+        document.getElementById("productsTitle").textContent =
+          currentCategory;
+      }
+
+      return;
+    }
+
+
+    /* الأقسام التي نريد منها منتجًا واحدًا في الرئيسية */
+    const featuredCategories = [
+      "ساعات",
+      "إكسسوارات نسائية",
+      "شالات",
+      "ملابس صلاة"
+    ];
+
+
+    const featuredProducts = [];
+
+
+    featuredCategories.forEach(category => {
+
+      const categoryProducts = products.filter(
+        p => p.category === category
+      );
+
+      if(!categoryProducts.length) return;
+
+
+      /*
+        في قسم الساعات نحاول اختيار منتج رولكس أولًا.
+        إذا لم يوجد، نأخذ أول ساعة موجودة.
+      */
+      let chosenProduct;
+
+      if(category === "ساعات"){
+
+        chosenProduct =
+          categoryProducts.find(p =>
+            String(p.name || "")
+              .toLowerCase()
+              .includes("رولكس")
+          );
+
+        if(!chosenProduct){
+          chosenProduct =
+            categoryProducts.find(p =>
+              String(p.name || "")
+                .toLowerCase()
+                .includes("rolex")
+            );
+        }
+      }
+
+
+      if(!chosenProduct){
+        chosenProduct = categoryProducts[0];
+      }
+
+
+      featuredProducts.push(chosenProduct);
+
+    });
+
+
+    /* عنوان القسم في الرئيسية */
+    document.getElementById("productsTitle").textContent =
+      "مختارات من أزل";
+
+
+    document.getElementById("productsCount").textContent =
+      featuredProducts.length
+        ? `${featuredProducts.length} مختارات`
+        : "";
+
+
+    const box = document.getElementById("products");
+
+
+    if(!featuredProducts.length){
+
+      box.innerHTML =
+        '<div class="empty">قريبًا مختارات جديدة من أزل 🤍</div>';
+
+      return;
+    }
+
+
+    /* عرض الأربع منتجات */
+    box.innerHTML = featuredProducts.map(p => `
+
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="${escapeHTML(p.image_url || "")}"
+            alt="${escapeHTML(p.name || "منتج")}"
+            loading="lazy"
+            onerror="this.style.opacity='.15'">
+
+          <span class="product-badge">
+            AZAL
+          </span>
+
+        </div>
+
+
+        <div class="product-body">
+
+          <div class="product-cat">
+            ${escapeHTML(
+              p.subcategory ||
+              p.category ||
+              "AZAL"
+            )}
+          </div>
+
+
+          <h3>
+            ${escapeHTML(p.name || "منتج")}
+          </h3>
+
+
+          ${
+            p.description
+            ? `
+              <div class="product-description">
+                ${escapeHTML(p.description)}
+              </div>
+            `
+            : ""
+          }
+
+
+          <div class="price">
+            ${Number(p.price || 0).toFixed(0)} ₪
+          </div>
+
+
+          <button
+            class="add"
+            onclick="addToCart(${Number(p.id)})">
+
+            أضيفي للسلة
+
+          </button>
+
+        </div>
+
+      </article>
+
+    `).join("");
+
+  };
+
+
+  /*
+    نخلي زر "الرئيسية" يرجع للمختارات الأربعة
+  */
+  const oldGoCategory = goCategory;
+
+  goCategory = function(name){
+
+    oldGoCategory(name);
+
+    if(name === "الكل"){
+
+      currentCategory = "الكل";
+
+      renderCategories();
+      renderProducts();
+
+    }
+
+  };
+
+
+  /* تحديث العرض */
+  setTimeout(() => {
+    renderProducts();
+  }, 900);
+
+})();
+</script>
+
+<!-- ===== END AZAL HOME FEATURED PRODUCTS ===== -->
 </body>
 </html>

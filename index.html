@@ -3161,274 +3161,216 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 </script>
 
 <!-- ===== END AZAL BUTTERFLIES ===== -->
-  <!-- ===== AZAL BLUE + BLUSH EXPERIMENT ===== -->
+<!-- ===== AZAL SOFT GLASS BACKGROUND ===== -->
 
-<style id="azal-pink-waves-test">
+<style id="azal-soft-glass">
 
-/* نخفي الدوائر القديمة */
+/* إلغاء الدوائر القديمة */
 .hero::before,
 .hero::after{
   display:none !important;
 }
 
-/* نخلي واجهة AZAL تستقبل التموجات */
 .hero{
   position:relative !important;
   overflow:hidden !important;
 
   background:
     linear-gradient(
-      125deg,
-      #f9fcff 0%,
-      #eef7ff 38%,
-      #fff4f7 72%,
-      #f8fbff 100%
+      135deg,
+      #fbfdff 0%,
+      #f1f8fd 48%,
+      #ffffff 100%
     ) !important;
 }
 
-/* طبقة التموجات */
-.hero .azal-fabric-waves{
+/* الخلفية الناعمة */
+.azal-glass-bg{
   position:absolute;
-  inset:-12%;
-  z-index:0;
-  pointer-events:none;
+  inset:0;
   overflow:hidden;
+  pointer-events:none;
+  z-index:0;
 }
 
-/* التموج الأزرق */
-.hero .azal-wave-blue{
+/* تموج علوي */
+.azal-glass-bg::before{
+  content:"";
   position:absolute;
+
   width:75%;
-  height:60%;
-  left:-18%;
-  top:8%;
+  height:42%;
 
-  border-radius:45% 55% 62% 38% / 55% 42% 58% 45%;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(143,202,238,.06),
-      rgba(111,181,226,.22),
-      rgba(222,243,255,.08)
-    );
-
-  filter:blur(2px);
-  transform:rotate(-12deg) skewX(-8deg);
-
-  animation:azalFabricBlue 13s ease-in-out infinite alternate;
-}
-
-/* التموج الوردي */
-.hero .azal-wave-pink{
-  position:absolute;
-  width:72%;
-  height:58%;
-  right:-20%;
-  bottom:2%;
-
-  border-radius:55% 45% 38% 62% / 40% 60% 45% 55%;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,220,229,.08),
-      rgba(238,173,194,.22),
-      rgba(255,240,245,.10)
-    );
-
-  filter:blur(2px);
-  transform:rotate(13deg) skewX(9deg);
-
-  animation:azalFabricPink 15s ease-in-out infinite alternate;
-}
-
-/* طبقة شيفون شفافة إضافية */
-.hero .azal-wave-soft{
-  position:absolute;
-  width:95%;
-  height:32%;
-  left:4%;
-  top:38%;
+  top:-18%;
+  left:-10%;
 
   border-radius:50%;
 
   background:
     linear-gradient(
-      90deg,
-      transparent,
-      rgba(171,215,242,.10),
-      rgba(247,199,214,.12),
-      transparent
+      120deg,
+      rgba(255,255,255,.8),
+      rgba(170,213,239,.16),
+      rgba(255,255,255,.2)
+    );
+
+  filter:blur(8px);
+
+  transform:rotate(-8deg);
+
+  animation:azalGlassOne 14s ease-in-out infinite alternate;
+}
+
+/* تموج سفلي */
+.azal-glass-bg::after{
+  content:"";
+  position:absolute;
+
+  width:85%;
+  height:45%;
+
+  right:-20%;
+  bottom:-20%;
+
+  border-radius:50%;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255,255,255,.15),
+      rgba(112,180,224,.14),
+      rgba(255,255,255,.75)
     );
 
   filter:blur(10px);
 
-  transform:rotate(-7deg);
+  transform:rotate(8deg);
 
-  animation:azalFabricSoft 11s ease-in-out infinite alternate;
+  animation:azalGlassTwo 16s ease-in-out infinite alternate;
 }
 
-/* حركة هادية كأن القماش يتحرك */
-@keyframes azalFabricBlue{
+/* خط ضوء ناعم */
+.azal-light-line{
+  position:absolute;
+
+  width:75%;
+  height:1px;
+
+  left:12%;
+  top:54%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(85,151,198,.22),
+      rgba(255,255,255,.9),
+      rgba(85,151,198,.22),
+      transparent
+    );
+
+  box-shadow:
+    0 0 18px rgba(116,184,226,.18);
+
+  transform:rotate(-5deg);
+}
+
+/* حركة خفيفة جدًا */
+@keyframes azalGlassOne{
+
   from{
     transform:
-      translate3d(-2%,0,0)
-      rotate(-12deg)
-      skewX(-8deg);
+      translate(-3%,0)
+      rotate(-8deg);
   }
 
   to{
     transform:
-      translate3d(8%,5%,0)
-      rotate(-6deg)
-      skewX(-3deg);
+      translate(9%,8%)
+      rotate(-3deg);
   }
 }
 
-@keyframes azalFabricPink{
+@keyframes azalGlassTwo{
+
   from{
     transform:
-      translate3d(0,3%,0)
-      rotate(13deg)
-      skewX(9deg);
+      translate(0,0)
+      rotate(8deg);
   }
 
   to{
     transform:
-      translate3d(-9%,-5%,0)
-      rotate(7deg)
-      skewX(4deg);
-  }
-}
-
-@keyframes azalFabricSoft{
-  from{
-    transform:
-      translateX(-5%)
-      rotate(-7deg)
-      scale(1);
-  }
-
-  to{
-    transform:
-      translateX(6%)
-      rotate(-3deg)
-      scale(1.08);
+      translate(-9%,-7%)
+      rotate(3deg);
   }
 }
 
 
-/* نخلي محتوى الواجهة فوق التموجات */
-.hero > *:not(.azal-fabric-waves){
+/* محتوى الواجهة يبقى فوق الخلفية */
+.hero > *:not(.azal-glass-bg){
   position:relative;
   z-index:2;
 }
 
 
-/* لمسات وردية خفيفة على الموقع */
-
-/* بطاقات الأقسام */
-.category-card:nth-child(3n+2){
-  background:
-    linear-gradient(
-      145deg,
-      #ffffff,
-      #fff7f9
-    ) !important;
-}
-
-/* بطاقات المنتجات */
-.product-card{
-  box-shadow:
-    0 12px 35px rgba(36,93,139,.07),
-    0 5px 20px rgba(220,155,178,.05) !important;
-}
-
-/* لمسة وردية عند المرور */
-.product-card:hover{
-  box-shadow:
-    0 18px 45px rgba(36,93,139,.11),
-    0 8px 28px rgba(220,155,178,.11) !important;
-}
-
-/* العناوين تبقى كحلي */
-.hero h1,
-.section-title,
-.story h2{
-  color:#153a63 !important;
-}
-
-/* خط صغير وردي تحت بعض العناوين */
-.section-title::after{
-  background:
-    linear-gradient(
-      90deg,
-      #7eb9df,
-      #eab2c4,
-      #7eb9df
-    ) !important;
+/* لمعة بسيطة حول AZAL */
+.hero h1{
+  text-shadow:
+    0 8px 28px rgba(37,91,132,.08) !important;
 }
 
 
-/* الجوال */
+/* للجوال */
 @media(max-width:700px){
 
-  .hero .azal-wave-blue{
-    width:95%;
-    height:48%;
-    left:-40%;
-  }
-
-  .hero .azal-wave-pink{
-    width:95%;
-    height:48%;
-    right:-40%;
-  }
-
-  .hero .azal-wave-soft{
+  .azal-glass-bg::before{
     width:110%;
-    left:-5%;
+    left:-45%;
   }
+
+  .azal-glass-bg::after{
+    width:110%;
+    right:-45%;
+  }
+
 }
 
 </style>
 
 
-<script id="azal-pink-waves-script">
+<script>
 
 (function(){
 
-  const hero = document.querySelector(".hero");
+  const hero =
+    document.querySelector(".hero");
 
   if(!hero) return;
 
-  /* يمنع تكرار التموجات */
-  const oldWaves =
-    hero.querySelector(".azal-fabric-waves");
+  /* يشيل أي خلفية تجريبية قديمة */
+  hero
+    .querySelectorAll(
+      ".azal-fabric-waves, .azal-glass-bg"
+    )
+    .forEach(el => el.remove());
 
-  if(oldWaves){
-    oldWaves.remove();
-  }
 
-  const waves =
+  const bg =
     document.createElement("div");
 
-  waves.className =
-    "azal-fabric-waves";
+  bg.className =
+    "azal-glass-bg";
 
-  waves.innerHTML = `
-    <span class="azal-wave-blue"></span>
-    <span class="azal-wave-pink"></span>
-    <span class="azal-wave-soft"></span>
-  `;
+  bg.innerHTML =
+    '<span class="azal-light-line"></span>';
 
-  hero.prepend(waves);
+  hero.prepend(bg);
 
 })();
 
 </script>
 
-<!-- ===== END AZAL BLUE + BLUSH EXPERIMENT ===== -->
+<!-- ===== END AZAL SOFT GLASS BACKGROUND ===== -->
 </body>
 </html>

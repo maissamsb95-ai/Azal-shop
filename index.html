@@ -2577,5 +2577,213 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 });
 </script>
 <!-- ===== END AZAL LUXURY REDESIGN ===== -->
+  <!-- ===== AZAL FLYING BUTTERFLY ===== -->
+<style>
+
+/* نشيل الزخارف القديمة حول شعار AZAL العلوي */
+.logo-main::before,
+.logo-main::after{
+  display:none !important;
+}
+
+/* الشعار يصير مرجع لمسار الفراشة */
+.logo{
+  position:relative !important;
+  overflow:visible !important;
+}
+
+.logo-main{
+  position:relative !important;
+}
+
+/* الفراشة الصغيرة */
+.azal-butterfly{
+  position:absolute;
+  width:18px;
+  height:14px;
+  top:5px;
+  left:50%;
+  z-index:10;
+  pointer-events:none;
+  filter:drop-shadow(0 3px 4px rgba(25,73,111,.20));
+  animation:
+    butterflyFly 7s ease-in-out infinite,
+    butterflyBob 1.2s ease-in-out infinite alternate;
+}
+
+/* الجناحين */
+.azal-butterfly .wing{
+  position:absolute;
+  top:3px;
+  width:9px;
+  height:11px;
+  background:
+    linear-gradient(
+      145deg,
+      #dff4ff 5%,
+      #7db5dc 48%,
+      #245f91 100%
+    );
+  border:1px solid rgba(25,72,109,.28);
+}
+
+/* الجناح الأول */
+.azal-butterfly .wing-left{
+  right:7px;
+  border-radius:90% 20% 80% 30%;
+  transform-origin:right center;
+  animation:wingLeft .25s ease-in-out infinite alternate;
+}
+
+/* الجناح الثاني */
+.azal-butterfly .wing-right{
+  left:7px;
+  border-radius:20% 90% 30% 80%;
+  transform-origin:left center;
+  animation:wingRight .25s ease-in-out infinite alternate;
+}
+
+/* جسم الفراشة */
+.azal-butterfly .body{
+  position:absolute;
+  width:2px;
+  height:10px;
+  top:4px;
+  left:8px;
+  border-radius:5px;
+  background:#173f63;
+}
+
+/* مسار الطيران حول AZAL */
+@keyframes butterflyFly{
+
+  0%{
+    transform:
+      translate(-72px,5px)
+      rotate(-8deg);
+  }
+
+  15%{
+    transform:
+      translate(-35px,-15px)
+      rotate(7deg);
+  }
+
+  30%{
+    transform:
+      translate(8px,-20px)
+      rotate(10deg);
+  }
+
+  45%{
+    transform:
+      translate(65px,-7px)
+      rotate(16deg);
+  }
+
+  60%{
+    transform:
+      translate(73px,17px)
+      rotate(-5deg);
+  }
+
+  75%{
+    transform:
+      translate(20px,25px)
+      rotate(-13deg);
+  }
+
+  90%{
+    transform:
+      translate(-50px,17px)
+      rotate(-12deg);
+  }
+
+  100%{
+    transform:
+      translate(-72px,5px)
+      rotate(-8deg);
+  }
+}
+
+/* حركة خفيفة أثناء الطيران */
+@keyframes butterflyBob{
+  from{margin-top:-2px}
+  to{margin-top:2px}
+}
+
+/* رفرفة الأجنحة */
+@keyframes wingLeft{
+  from{transform:rotateY(10deg) rotate(-15deg)}
+  to{transform:rotateY(65deg) rotate(-5deg)}
+}
+
+@keyframes wingRight{
+  from{transform:rotateY(-10deg) rotate(15deg)}
+  to{transform:rotateY(-65deg) rotate(5deg)}
+}
+
+/* أصغر شوي على الجوال */
+@media(max-width:700px){
+
+  .azal-butterfly{
+    width:15px;
+    height:12px;
+  }
+
+  .azal-butterfly .wing{
+    width:8px;
+    height:9px;
+  }
+
+  @keyframes butterflyFly{
+
+    0%,100%{
+      transform:translate(-53px,4px) rotate(-8deg);
+    }
+
+    25%{
+      transform:translate(0,-14px) rotate(8deg);
+    }
+
+    50%{
+      transform:translate(52px,3px) rotate(10deg);
+    }
+
+    75%{
+      transform:translate(0,20px) rotate(-10deg);
+    }
+  }
+}
+
+</style>
+
+<script>
+
+(function(){
+
+  const logo=document.querySelector(".logo");
+
+  if(!logo)return;
+
+  /* نتأكد ما نضيفها مرتين */
+  if(document.querySelector(".azal-butterfly"))return;
+
+  const butterfly=document.createElement("span");
+
+  butterfly.className="azal-butterfly";
+
+  butterfly.innerHTML=`
+    <span class="wing wing-left"></span>
+    <span class="body"></span>
+    <span class="wing wing-right"></span>
+  `;
+
+  logo.appendChild(butterfly);
+
+})();
+
+</script>
+<!-- ===== END AZAL FLYING BUTTERFLY ===== -->
 </body>
 </html>

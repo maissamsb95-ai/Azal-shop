@@ -3590,5 +3590,117 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 </script>
 
 <!-- ===== END AZAL HOME FEATURED PRODUCTS ===== -->
+  <!-- ===== AZAL HOME PICKS ===== -->
+<script>
+(function () {
+
+  const oldRenderProducts = window.renderProducts;
+  if (typeof oldRenderProducts !== "function") return;
+
+  window.renderProducts = function () {
+
+    /* الرئيسية فقط */
+    if (selectedCategory === "الكل") {
+
+      const allProducts = products;
+      const picks = [];
+
+      /* 1 ـ الساعة: نخلي الاختيار الحالي */
+      const watches = allProducts.filter(p =>
+        p.category === "ساعات"
+      );
+
+      if (watches.length) {
+        const rolex = watches.find(p =>
+          (p.name || "").toLowerCase().includes("رولكس") ||
+          (p.name || "").toLowerCase().includes("rolex")
+        );
+
+        picks.push(rolex || watches[0]);
+      }
+
+
+      /* 2 ـ الإكسسوارات: نخلي الاختيار الحالي */
+      const accessories = allProducts.filter(p =>
+        p.category === "إكسسوارات نسائية"
+      );
+
+      if (accessories.length) {
+        picks.push(accessories[0]);
+      }
+
+
+      /* 3 ـ الشالات: شال مودال الغزال تحديدًا */
+      const shawls = allProducts.filter(p =>
+        p.category === "شالات"
+      );
+
+      if (shawls.length) {
+
+        const gazelleShawl = shawls.find(p => {
+          const name = (p.name || "").toLowerCase();
+
+          return (
+            name.includes("الغزال") ||
+            name.includes("غزال")
+          );
+        });
+
+        picks.push(gazelleShawl || shawls[0]);
+      }
+
+
+      /* 4 ـ ملابس الصلاة: المنتج الثاني */
+      const prayerWear = allProducts.filter(p =>
+        p.category === "ملابس صلاة"
+      );
+
+      if (prayerWear.length) {
+        picks.push(
+          prayerWear[1] || prayerWear[0]
+        );
+      }
+
+
+      /* نعرض المختارات فقط */
+      products = picks;
+
+      oldRenderProducts();
+
+      /* نرجع القائمة الأصلية حتى الأقسام تظل شغالة */
+      products = allProducts;
+
+
+      const title =
+        document.getElementById("productsTitle");
+
+      if (title) {
+        title.textContent = "مختارات من أزل";
+      }
+
+
+      const count =
+        document.getElementById("productsCount");
+
+      if (count) {
+        count.textContent = "مختارات مميزة لكِ";
+      }
+
+      return;
+    }
+
+
+    /* إذا دخلتِ أي قسم تظهر كل منتجاته */
+    oldRenderProducts();
+
+  };
+
+
+  /* تحديث العرض */
+  window.renderProducts();
+
+})();
+</script>
+<!-- ===== END AZAL HOME PICKS ===== -->
 </body>
 </html>

@@ -3372,6 +3372,185 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 </script>
 
 <!-- ===== END AZAL SOFT GLASS BACKGROUND ===== -->
+<!-- ===== AZAL FEATURED PRODUCTS ===== -->
+<script>
+(function(){
 
+  /* نحفظ دالة العرض الحالية */
+  const azalOriginalRender = renderProducts;
+
+  renderProducts = function(){
+
+    const q = document
+      .getElementById("search")
+      .value.trim()
+      .toLowerCase();
+
+    /* إذا مو الرئيسية، نخلي كل شيء مثل ما هو */
+    if(currentCategory !== "الكل" || q){
+      azalOriginalRender();
+      return;
+    }
+
+    const picks = [];
+
+
+    /* 1 — طقم الساعة / رولكس */
+    const watches = products.filter(p =>
+      p.category === "ساعات"
+    );
+
+    if(watches.length){
+
+      const rolex = watches.find(p => {
+        const text =
+          `${p.name || ""} ${p.description || ""}`
+          .toLowerCase();
+
+        return (
+          text.includes("رولكس") ||
+          text.includes("rolex")
+        );
+      });
+
+      picks.push(rolex || watches[0]);
+    }
+
+
+    /* 2 — الإكسسوارات */
+    const accessories = products.filter(p =>
+      p.category === "إكسسوارات نسائية"
+    );
+
+    if(accessories.length){
+      picks.push(accessories[0]);
+    }
+
+
+    /* 3 — شال مودال الغزال */
+    const shawls = products.filter(p =>
+      p.category === "شالات"
+    );
+
+    if(shawls.length){
+
+      const gazelle = shawls.find(p => {
+
+        const text =
+          `${p.name || ""} ${p.description || ""} ${p.subcategory || ""}`
+          .toLowerCase();
+
+        return (
+          text.includes("شال مودال الغزال") ||
+          text.includes("مودال الغزال") ||
+          text.includes("الغزال")
+        );
+
+      });
+
+      picks.push(gazelle || shawls[0]);
+    }
+
+
+    /* 4 — المنتج الثاني من ملابس الصلاة */
+    const prayer = products.filter(p =>
+      p.category === "ملابس صلاة"
+    );
+
+    if(prayer.length){
+      picks.push(prayer[1] || prayer[0]);
+    }
+
+
+    /* العنوان */
+    document.getElementById("productsTitle").textContent =
+      "مختارات من أزل";
+
+    document.getElementById("productsCount").textContent =
+      `${picks.length} منتجات مختارة`;
+
+
+    const box = document.getElementById("products");
+
+    if(!picks.length){
+      box.innerHTML =
+        '<div class="empty">قريبًا مختارات جديدة من أزل 🤍</div>';
+      return;
+    }
+
+
+    /* عرض الأربع منتجات */
+    box.innerHTML = picks.map(p => `
+
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="${escapeHTML(p.image_url || "")}"
+            alt="${escapeHTML(p.name || "منتج")}"
+            loading="lazy"
+            onerror="this.style.opacity='.15'">
+
+          <span class="product-badge">
+            AZAL
+          </span>
+
+        </div>
+
+
+        <div class="product-body">
+
+          <div class="product-cat">
+            ${escapeHTML(
+              p.subcategory ||
+              p.category ||
+              "AZAL"
+            )}
+          </div>
+
+
+          <h3>
+            ${escapeHTML(p.name || "منتج")}
+          </h3>
+
+
+          ${
+            p.description
+            ? `
+              <div class="product-description">
+                ${escapeHTML(p.description)}
+              </div>
+            `
+            : ""
+          }
+
+
+          <div class="price">
+            ${Number(p.price || 0).toFixed(0)} ₪
+          </div>
+
+
+          <button
+            class="add"
+            onclick="addToCart(${Number(p.id)})">
+            أضيفي للسلة
+          </button>
+
+        </div>
+
+      </article>
+
+    `).join("");
+
+  };
+
+
+  /* نعرض المختارات الآن */
+  renderProducts();
+
+})();
+</script>
+<!-- ===== END AZAL FEATURED PRODUCTS ===== -->
 </body>
 </html>

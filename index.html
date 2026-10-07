@@ -3161,5 +3161,274 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 </script>
 
 <!-- ===== END AZAL BUTTERFLIES ===== -->
+  <!-- ===== AZAL BLUE + BLUSH EXPERIMENT ===== -->
+
+<style id="azal-pink-waves-test">
+
+/* نخفي الدوائر القديمة */
+.hero::before,
+.hero::after{
+  display:none !important;
+}
+
+/* نخلي واجهة AZAL تستقبل التموجات */
+.hero{
+  position:relative !important;
+  overflow:hidden !important;
+
+  background:
+    linear-gradient(
+      125deg,
+      #f9fcff 0%,
+      #eef7ff 38%,
+      #fff4f7 72%,
+      #f8fbff 100%
+    ) !important;
+}
+
+/* طبقة التموجات */
+.hero .azal-fabric-waves{
+  position:absolute;
+  inset:-12%;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+/* التموج الأزرق */
+.hero .azal-wave-blue{
+  position:absolute;
+  width:75%;
+  height:60%;
+  left:-18%;
+  top:8%;
+
+  border-radius:45% 55% 62% 38% / 55% 42% 58% 45%;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(143,202,238,.06),
+      rgba(111,181,226,.22),
+      rgba(222,243,255,.08)
+    );
+
+  filter:blur(2px);
+  transform:rotate(-12deg) skewX(-8deg);
+
+  animation:azalFabricBlue 13s ease-in-out infinite alternate;
+}
+
+/* التموج الوردي */
+.hero .azal-wave-pink{
+  position:absolute;
+  width:72%;
+  height:58%;
+  right:-20%;
+  bottom:2%;
+
+  border-radius:55% 45% 38% 62% / 40% 60% 45% 55%;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,220,229,.08),
+      rgba(238,173,194,.22),
+      rgba(255,240,245,.10)
+    );
+
+  filter:blur(2px);
+  transform:rotate(13deg) skewX(9deg);
+
+  animation:azalFabricPink 15s ease-in-out infinite alternate;
+}
+
+/* طبقة شيفون شفافة إضافية */
+.hero .azal-wave-soft{
+  position:absolute;
+  width:95%;
+  height:32%;
+  left:4%;
+  top:38%;
+
+  border-radius:50%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(171,215,242,.10),
+      rgba(247,199,214,.12),
+      transparent
+    );
+
+  filter:blur(10px);
+
+  transform:rotate(-7deg);
+
+  animation:azalFabricSoft 11s ease-in-out infinite alternate;
+}
+
+/* حركة هادية كأن القماش يتحرك */
+@keyframes azalFabricBlue{
+  from{
+    transform:
+      translate3d(-2%,0,0)
+      rotate(-12deg)
+      skewX(-8deg);
+  }
+
+  to{
+    transform:
+      translate3d(8%,5%,0)
+      rotate(-6deg)
+      skewX(-3deg);
+  }
+}
+
+@keyframes azalFabricPink{
+  from{
+    transform:
+      translate3d(0,3%,0)
+      rotate(13deg)
+      skewX(9deg);
+  }
+
+  to{
+    transform:
+      translate3d(-9%,-5%,0)
+      rotate(7deg)
+      skewX(4deg);
+  }
+}
+
+@keyframes azalFabricSoft{
+  from{
+    transform:
+      translateX(-5%)
+      rotate(-7deg)
+      scale(1);
+  }
+
+  to{
+    transform:
+      translateX(6%)
+      rotate(-3deg)
+      scale(1.08);
+  }
+}
+
+
+/* نخلي محتوى الواجهة فوق التموجات */
+.hero > *:not(.azal-fabric-waves){
+  position:relative;
+  z-index:2;
+}
+
+
+/* لمسات وردية خفيفة على الموقع */
+
+/* بطاقات الأقسام */
+.category-card:nth-child(3n+2){
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fff7f9
+    ) !important;
+}
+
+/* بطاقات المنتجات */
+.product-card{
+  box-shadow:
+    0 12px 35px rgba(36,93,139,.07),
+    0 5px 20px rgba(220,155,178,.05) !important;
+}
+
+/* لمسة وردية عند المرور */
+.product-card:hover{
+  box-shadow:
+    0 18px 45px rgba(36,93,139,.11),
+    0 8px 28px rgba(220,155,178,.11) !important;
+}
+
+/* العناوين تبقى كحلي */
+.hero h1,
+.section-title,
+.story h2{
+  color:#153a63 !important;
+}
+
+/* خط صغير وردي تحت بعض العناوين */
+.section-title::after{
+  background:
+    linear-gradient(
+      90deg,
+      #7eb9df,
+      #eab2c4,
+      #7eb9df
+    ) !important;
+}
+
+
+/* الجوال */
+@media(max-width:700px){
+
+  .hero .azal-wave-blue{
+    width:95%;
+    height:48%;
+    left:-40%;
+  }
+
+  .hero .azal-wave-pink{
+    width:95%;
+    height:48%;
+    right:-40%;
+  }
+
+  .hero .azal-wave-soft{
+    width:110%;
+    left:-5%;
+  }
+}
+
+</style>
+
+
+<script id="azal-pink-waves-script">
+
+(function(){
+
+  const hero = document.querySelector(".hero");
+
+  if(!hero) return;
+
+  /* يمنع تكرار التموجات */
+  const oldWaves =
+    hero.querySelector(".azal-fabric-waves");
+
+  if(oldWaves){
+    oldWaves.remove();
+  }
+
+  const waves =
+    document.createElement("div");
+
+  waves.className =
+    "azal-fabric-waves";
+
+  waves.innerHTML = `
+    <span class="azal-wave-blue"></span>
+    <span class="azal-wave-pink"></span>
+    <span class="azal-wave-soft"></span>
+  `;
+
+  hero.prepend(waves);
+
+})();
+
+</script>
+
+<!-- ===== END AZAL BLUE + BLUSH EXPERIMENT ===== -->
 </body>
 </html>

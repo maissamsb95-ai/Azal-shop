@@ -3552,5 +3552,41 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 })();
 </script>
 <!-- ===== END AZAL FEATURED PRODUCTS ===== -->
+  
+<!-- AZAL SHOP Visitor Counter -->
+<script>
+(function () {
+  try {
+    // Count one visit per browser tab session
+    if (sessionStorage.getItem("azal_visit_counted")) return;
+
+    const visitorClient = supabase.createClient(
+      "https://dyycupydbyqfpugtpwoa.supabase.co",
+      "sb_publishable_hYQzWO6VYm_DI_lamIPtAA_Q0fU967k",
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false
+        }
+      }
+    );
+
+    visitorClient
+      .from("store_visits")
+      .insert({})
+      .then(({ error }) => {
+        if (!error) {
+          sessionStorage.setItem("azal_visit_counted", "1");
+        } else {
+          console.warn("Visit counter:", error.message);
+        }
+      });
+  } catch (error) {
+    console.warn("Visit counter:", error);
+  }
+})();
+</script>
+
 </body>
 </html>

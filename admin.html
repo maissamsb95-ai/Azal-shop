@@ -1059,5 +1059,169 @@ function formatDate(value){
 checkSession();
 </script>
 
+<!-- AZAL ADMIN: Orders Archive & Visitor Statistics -->
+<style>
+.azal-extra-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}
+.azal-extra-tabs button{border:0;border-radius:9px;padding:11px 16px;background:#e3edf6;color:#173a63;font-weight:bold}
+.azal-extra-tabs button.selected{background:#173a63;color:#fff}
+.azal-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.azal-stat{background:#f0f6fc;padding:20px;border-radius:14px;text-align:center}
+.azal-stat strong{display:block;font-size:30px;color:#173a63}
+.azal-stat span{font-size:13px;color:#61778a}
+.azal-delete{background:#b44545;color:white;border:0;border-radius:8px;padding:10px 15px;margin-top:12px}
+@media(max-width:600px){.azal-stats-grid{grid-template-columns:1fr}}
+</style>
+
+<script>
+(function(){
+  let archiveMode = false;
+  const ordersPanel = document.getElementById("ordersPanel");
+  const ordersList = document.getElementById("ordersList");
+  const tabs = document.querySelector(".tabs");
+
+  if(!ordersPanel || !ordersList || !tabs) return;
+
+  const filters = document.createElement("div");
+  filters.className = "azal-extra-tabs";
+  filters.innerHTML = `
+    <button id="azalActiveBtn" class="selected">الطلبات الحالية</button>
+    <button id="azalArchiveBtn">الطلبات المكتملة / الأرشيف</button>
+  `;
+  ordersList.before(filters);
+
+  const statsTab = document.createElement("button");
+  statsTab.className = "tab";
+  statsTab.textContent = "إحصائيات الزيارات";
+  tabs.appendChild(statsTab);
+
+  const statsPanel = document.createElement("section");
+  statsPanel.className = "panel";
+  statsPanel.id = "azalStatsPanel";
+  statsPanel.innerHTML = `
+    <div class="card">
+      <h3>إحصائيات زيارات AZAL SHOP 🦋</h3>
+      <div class="azal-stats-grid">
+        <div class="azal-stat"><strong id="azalToday">—</strong><span>اليوم</span></div>
+        <div class="azal-stat"><strong id="azalWeek">—</strong><span>آخر 7 أيام</span></div>
+        <div class="azal-stat"><strong id="azalTotal">—</strong><span>إجمالي الزيارات</span></div>
+      </div>
+      <p class="muted" id="azalStatsMessage">يبدأ العد بعد تفعيل العداد في واجهة المتجر.</p>
+      <button class="btn" id="azalRefreshStats">تحديث الإحصائيات</button>
+    </div>
+  `;
+  ordersPanel.after(statsPanel);
+
+  const originalLoadOrders = window.loadOrders;
+  const originalUpdateStatus = window.updateOrderStatus;
+
+  function isArchived(status){
+    return ["completed","cancelled"].includes(status);
+  }
+
+  async function refreshOrders(){
+    await originalLoadOrders();
+
+    const {data,error} = await sb
+      .from("orders")
+      .select("id,status")
+      .order("created_at",{ascending:false});
+
+    if(error){
+      console.error(error);
+      return;
+    }
+
+    const cards = ordersList.querySelectorAll(".order");
+    const orders = data || [];
+
+    cards.forEach((card,index)=>{
+      const order = orders[index];
+      if(!order) return;
+
+      card.style.display =
+        isArchived(order.status) === archiveMode ? "" : "none";
+
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "azal-delete";
+      deleteButton.textContent = "حذف الطلب نهائيًا";
+      deleteButton.onclick = async ()=>{
+        if(!confirm("متأكدة بدك تحذفي الطلب رقم "+order.id+" نهائيًا؟ ما بترجعيه بعد الحذف.")) return;
+
+        const {error} = await sb
+          .from("orders")
+          .delete()
+          .eq("id",order.id);
+
+        if(error){
+          alert("تعذر حذف الطلب: "+error.message);
+          return;
+        }
+
+        await refreshOrders();
+      };
+
+      if(isArchived(order.status)) card.appendChild(deleteButton);
+    });
+
+    const visible = orders.filter(o=>isArchived(o.status)===archiveMode);
+    if(!visible.length){
+      ordersList.innerHTML = '<div class="loading">لا توجد طلبات في هذا القسم.</div>';
+    }
+  }
+
+  window.loadOrders = refreshOrders;
+
+  window.updateOrderStatus = async function(id){
+    await originalUpdateStatus(id);
+    await refreshOrders();
+  };
+
+  function selectOrdersTab(archived){
+    archiveMode = archived;
+    document.getElementById("azalActiveBtn").classList.toggle("selected",!archived);
+    document.getElementById("azalArchiveBtn").classList.toggle("selected",archived);
+    refreshOrders();
+  }
+
+  document.getElementById("azalActiveBtn").onclick = ()=>selectOrdersTab(false);
+  document.getElementById("azalArchiveBtn").onclick = ()=>selectOrdersTab(true);
+
+  async function loadStats(){
+    const message = document.getElementById("azalStatsMessage");
+    message.textContent = "جاري تحميل الإحصائيات...";
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const week = new Date();
+    week.setDate(week.getDate()-7);
+
+    const queries = [
+      sb.from("store_visits").select("*",{count:"exact",head:true}).gte("visited_at",today.toISOString()),
+      sb.from("store_visits").select("*",{count:"exact",head:true}).gte("visited_at",week.toISOString()),
+      sb.from("store_visits").select("*",{count:"exact",head:true})
+    ];
+
+    const results = await Promise.all(queries);
+    if(results.some(r=>r.error)){
+      message.textContent = "تعذر تحميل الإحصائيات. تأكدي من تسجيل الدخول.";
+      return;
+    }
+
+    document.getElementById("azalToday").textContent = results[0].count ?? 0;
+    document.getElementById("azalWeek").textContent = results[1].count ?? 0;
+    document.getElementById("azalTotal").textContent = results[2].count ?? 0;
+    message.textContent = "الإحصائيات تبدأ من تاريخ تفعيل العداد، وليست زيارات سابقة.";
+  }
+
+  statsTab.onclick = ()=>{
+    window.showTab("azalStatsPanel",statsTab);
+    loadStats();
+  };
+
+  document.getElementById("azalRefreshStats").onclick = loadStats;
+})();
+</script>
+
 </body>
 </html>

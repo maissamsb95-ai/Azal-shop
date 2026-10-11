@@ -3588,5 +3588,61 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 })();
 </script>
 
+<!-- AZAL SHOP Instagram -->
+<style>
+.azal-instagram-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #153a63;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 18px;
+  border: 1px solid #dce7f0;
+  border-radius: 30px;
+  background: #fff;
+  transition: .2s;
+}
+.azal-instagram-link:hover {
+  background: #eaf3fb;
+}
+.azal-instagram-link svg {
+  width: 22px;
+  height: 22px;
+}
+</style>
+
+<script>
+(function () {
+  const footer = document.querySelector("footer");
+  if (!footer || document.getElementById("azalInstagram")) return;
+
+  const link = document.createElement("a");
+  link.id = "azalInstagram";
+  link.className = "azal-instagram-link";
+  link.href = "https://www.instagram.com/_azalshop/";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.setAttribute("aria-label", "إنستغرام متجر أزل");
+
+  link.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.8"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+    </svg>
+    <span>تابعونا على إنستغرام @_azalshop</span>
+  `;
+
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText = "text-align:center;padding:20px 12px;";
+  wrapper.appendChild(link);
+  footer.appendChild(wrapper);
+})();
+</script>
+
 </body>
 </html>

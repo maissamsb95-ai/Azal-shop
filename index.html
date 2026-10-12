@@ -3764,15 +3764,25 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
     if(typeof products==="undefined" || !products.length)
       return;
 
-    const newest=products
-      .filter(p=>p.active!==false && p.image_url)
-      .slice()
-      .sort((a,b)=>{
-        const dateA=Date.parse(a.created_at||"")||0;
-        const dateB=Date.parse(b.created_at||"")||0;
-        return dateB-dateA || Number(b.id)-Number(a.id);
-      })
-      .slice(0,4);
+   
+const sevenDays = 7 * 24 * 60 * 60 * 1000;
+const now = Date.now();
+
+const newest = products
+  .filter(p => {
+    if (p.active === false || !p.image_url) return false;
+
+    const addedAt = Date.parse(p.created_at || "");
+    if (!Number.isFinite(addedAt)) return false;
+
+    const age = now - addedAt;
+    return age >= 0 && age < sevenDays;
+  })
+  .slice()
+  .sort((a, b) =>
+    Date.parse(b.created_at) - Date.parse(a.created_at)
+  );
+
 
     const grid=document.getElementById("azalNewGrid");
 

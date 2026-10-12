@@ -3644,5 +3644,177 @@ document.querySelectorAll(".perk-icon").forEach((el,i)=>{
 })();
 </script>
 
+<!-- AZAL SHOP | NEW ARRIVALS -->
+<style>
+#azalNewArrivals{
+  max-width:1200px;
+  margin:45px auto;
+  padding:25px 18px;
+  display:none;
+}
+.azal-new-heading{
+  text-align:center;
+  margin-bottom:26px;
+}
+.azal-new-heading small{
+  color:#7593b0;
+  letter-spacing:3px;
+}
+.azal-new-heading h2{
+  color:#153a63;
+  font-size:27px;
+  margin:8px 0;
+}
+.azal-new-heading p{
+  color:#788b9d;
+  font-size:13px;
+}
+.azal-new-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:17px;
+}
+.azal-new-card{
+  border:1px solid #e0eaf2;
+  border-radius:15px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 7px 22px #153a6310;
+}
+.azal-new-image{
+  position:relative;
+}
+.azal-new-image img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+}
+.azal-new-badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:#153a63;
+  color:white;
+  font-size:11px;
+  padding:5px 12px;
+  border-radius:20px;
+}
+.azal-new-info{
+  padding:15px;
+  text-align:center;
+}
+.azal-new-info h3{
+  color:#173a63;
+  font-size:15px;
+  margin:5px 0 10px;
+}
+.azal-new-price{
+  font-weight:bold;
+  color:#376b9d;
+  margin-bottom:12px;
+}
+.azal-new-info button{
+  background:#153a63;
+  color:white;
+  border:0;
+  border-radius:9px;
+  padding:11px;
+  width:100%;
+  cursor:pointer;
+}
+.azal-new-info button:disabled{
+  background:#aebdcb;
+  cursor:not-allowed;
+}
+@media(max-width:650px){
+  .azal-new-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .azal-new-info{padding:10px}
+  .azal-new-info h3{font-size:13px}
+}
+</style>
+
+<script>
+(function(){
+  if(document.getElementById("azalNewArrivals")) return;
+
+  const section=document.createElement("section");
+  section.id="azalNewArrivals";
+
+  section.innerHTML=`
+    <div class="azal-new-heading">
+      <small>JUST ARRIVED</small>
+      <h2>وصل حديثًا إلى أزل 🦋</h2>
+      <p>قطع جديدة اختيرت لكِ بكل حب</p>
+    </div>
+    <div class="azal-new-grid" id="azalNewGrid"></div>
+  `;
+
+  const productsSection=
+    document.getElementById("productsSection");
+
+  if(!productsSection) return;
+
+  productsSection.before(section);
+
+  function renderNewArrivals(){
+    if(typeof products==="undefined" || !products.length)
+      return;
+
+    const newest=products
+      .filter(p=>p.active!==false && p.image_url)
+      .slice()
+      .sort((a,b)=>{
+        const dateA=Date.parse(a.created_at||"")||0;
+        const dateB=Date.parse(b.created_at||"")||0;
+        return dateB-dateA || Number(b.id)-Number(a.id);
+      })
+      .slice(0,4);
+
+    const grid=document.getElementById("azalNewGrid");
+
+    section.style.display=newest.length?"block":"none";
+
+    grid.innerHTML=newest.map(p=>{
+      const stock=Number(p.stock||0);
+      return `
+        <article class="azal-new-card">
+          <div class="azal-new-image">
+            <img src="${escapeHTML(p.image_url)}"
+                 alt="${escapeHTML(p.name||"منتج")}"
+                 loading="lazy">
+            <span class="azal-new-badge">جديد ✨</span>
+          </div>
+          <div class="azal-new-info">
+            <h3>${escapeHTML(p.name||"منتج")}</h3>
+            <div class="azal-new-price">
+              ${Number(p.price||0).toFixed(0)} ₪
+            </div>
+            <button
+              ${stock<=0?"disabled":""}
+              onclick="addToCart(${Number(p.id)})">
+              ${stock>0?"أضيفي للسلة":"غير متوفر"}
+            </button>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  const previousRender=renderProducts;
+
+  renderProducts=function(){
+    previousRender();
+    renderNewArrivals();
+  };
+
+  renderNewArrivals();
+})();
+</script>
+<!-- END AZAL NEW ARRIVALS -->
+
 </body>
 </html>

@@ -1223,5 +1223,172 @@ checkSession();
 })();
 </script>
 
+<!-- AZAL MANUAL NEW ARRIVALS -->
+<style>
+.azal-pick-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:12px;
+  margin:18px 0;
+}
+.azal-pick-item{
+  background:#f1f6fb;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+}
+.azal-pick-item img{
+  width:100%;
+  height:130px;
+  object-fit:cover;
+  border-radius:9px;
+}
+.azal-pick-item input{
+  width:auto;
+  margin:10px;
+}
+</style>
+
+<script>
+(function(){
+  const tabs=document.querySelector(".tabs");
+  const container=document.querySelector(".container");
+  if(!tabs || !container) return;
+
+  const tab=document.createElement("button");
+  tab.className="tab";
+  tab.textContent="المنتجات الجديدة";
+  tabs.appendChild(tab);
+
+  const panel=document.createElement("section");
+  panel.id="azalPickPanel";
+  panel.className="panel";
+  panel.innerHTML=`
+    <div class="card">
+      <h3>اختاري 5 منتجات جديدة 🦋</h3>
+      <p>حددي المنتجات التي تريدين إظهارها
+      في قسم وصل حديثًا.</p>
+      <div id="azalPickList" class="azal-pick-list"></div>
+      <p id="azalPickMessage" class="muted"></p>
+      <button class="btn" id="azalSavePicks">
+        حفظ المنتجات الجديدة
+      </button>
+    </div>
+  `;
+  container.appendChild(panel);
+
+  let selected=new Set();
+
+  async function loadPicks(){
+    const list=document.getElementById("azalPickList");
+    list.textContent="جاري تحميل المنتجات...";
+
+    const {data,error}=await sb
+      .from("Azal shop")
+      .select("id,name,image_url,stock,active,is_new_arrival")
+      .order("id",{ascending:false});
+
+    if(error){
+      list.textContent=error.message;
+      return;
+    }
+
+    const available=(data||[]).filter(p=>
+      p.active!==false &&
+      Number(p.stock||0)>0 &&
+      p.image_url
+    );
+
+    selected=new Set(
+      available.filter(p=>p.is_new_arrival).map(p=>p.id)
+    );
+
+    list.innerHTML="";
+
+    available.forEach(p=>{
+      const card=document.createElement("label");
+      card.className="azal-pick-item";
+
+      const img=document.createElement("img");
+      img.src=p.image_url;
+      img.alt=p.name||"";
+
+      const name=document.createElement("div");
+      name.textContent=p.name||"بدون اسم";
+
+      const checkbox=document.createElement("input");
+      checkbox.type="checkbox";
+      checkbox.checked=selected.has(p.id);
+
+      checkbox.onchange=()=>{
+        if(checkbox.checked){
+          if(selected.size>=5){
+            checkbox.checked=false;
+            alert("تقدرين تختارين 5 منتجات فقط");
+            return;
+          }
+          selected.add(p.id);
+        }else{
+          selected.delete(p.id);
+        }
+        updateCount();
+      };
+
+      card.append(img,name,checkbox);
+      list.appendChild(card);
+    });
+
+    updateCount();
+  }
+
+  function updateCount(){
+    document.getElementById("azalPickMessage")
+      .textContent=`تم اختيار ${selected.size} من 5 منتجات`;
+  }
+
+  document.getElementById("azalSavePicks").onclick=async()=>{
+    const button=document.getElementById("azalSavePicks");
+    button.disabled=true;
+
+    const {data,error}=await sb
+      .from("Azal shop")
+      .select("id,is_new_arrival");
+
+    if(error){
+      alert("تعذر تحميل البيانات: "+error.message);
+      button.disabled=false;
+      return;
+    }
+
+    for(const p of data||[]){
+      const shouldBeNew=selected.has(p.id);
+
+      if(Boolean(p.is_new_arrival)===shouldBeNew) continue;
+
+      const result=await sb
+        .from("Azal shop")
+        .update({is_new_arrival:shouldBeNew})
+        .eq("id",p.id);
+
+      if(result.error){
+        alert("تعذر الحفظ: "+result.error.message);
+        button.disabled=false;
+        return;
+      }
+    }
+
+    button.disabled=false;
+    alert("تم حفظ اختياراتك 🦋");
+    await loadPicks();
+  };
+
+  tab.onclick=()=>{
+    showTab("azalPickPanel",tab);
+    loadPicks();
+  };
+})();
+</script>
+<!-- END AZAL MANUAL NEW ARRIVALS -->
+
 </body>
 </html>

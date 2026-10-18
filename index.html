@@ -3819,5 +3819,190 @@ const newest = products
 </script>
 <!-- END AZAL NEW ARRIVALS -->
 
+<!-- AZAL CATEGORY MAKEOVER - START -->
+<style>
+/* تصميم أقسام أزل الجديد */
+#categories {
+  gap: 17px;
+}
+
+#categories .category-card {
+  position: relative;
+  isolation: isolate;
+  min-height: 195px;
+  padding: 24px 20px;
+  border: 1px solid rgba(127, 166, 200, .35);
+  border-radius: 23px;
+  overflow: hidden;
+  text-align: right;
+  color: #173a63;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #edf6ff 55%,
+    #dbeaf9 100%
+  );
+  box-shadow:
+    0 10px 25px rgba(35, 76, 118, .09),
+    inset 0 1px 0 rgba(255,255,255,.9);
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease,
+    border-color .3s ease;
+}
+
+/* تنويع ألوان الأقسام */
+#categories .category-card:nth-child(3n+2) {
+  background: linear-gradient(
+    135deg,
+    #ffffff,
+    #fff1f7 60%,
+    #f5deeb
+  );
+  border-color: #efd9e5;
+}
+
+#categories .category-card:nth-child(3n+3) {
+  background: linear-gradient(
+    135deg,
+    #ffffff,
+    #f1f2ff 55%,
+    #dfe9fa
+  );
+}
+
+/* لمعة ناعمة */
+#categories .category-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 150px;
+  height: 150px;
+  top: -75px;
+  left: -55px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.7);
+  filter: blur(5px);
+}
+
+/* إلغاء الدائرة القديمة */
+#categories .category-card::after {
+  content: "✦";
+  position: absolute;
+  z-index: 0;
+  width: auto;
+  height: auto;
+  left: 18px;
+  bottom: 13px;
+  background: none;
+  border-radius: 0;
+  color: rgba(83, 139, 185, .45);
+  font-size: 29px;
+}
+
+/* رقم القسم */
+#categories .category-number {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid rgba(92, 137, 175, .25);
+  border-radius: 30px;
+  background: rgba(255,255,255,.65);
+  color: #7197b7;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+/* اسم القسم */
+#categories .category-card h3 {
+  position: relative;
+  z-index: 1;
+  margin: 26px 0 9px;
+  color: #173a63;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+/* وصف القسم */
+#categories .category-card span {
+  position: relative;
+  z-index: 1;
+  color: #708da8;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* تأثير الحركة */
+#categories .category-card:hover {
+  transform: translateY(-7px);
+  border-color: #8aafd1;
+  box-shadow: 0 18px 35px rgba(35,76,118,.16);
+}
+
+#categories .category-card:active {
+  transform: scale(.97);
+}
+
+/* القسم المختار */
+#categories .category-card.active {
+  background: linear-gradient(
+    135deg,
+    #173a63,
+    #3c719f
+  );
+  border-color: #376e9f;
+  box-shadow: 0 15px 30px rgba(21,58,99,.2);
+}
+
+#categories .category-card.active h3 {
+  color: #fff;
+}
+
+#categories .category-card.active span {
+  color: #e1edf8;
+}
+
+#categories .category-card.active .category-number {
+  color: #fff;
+  background: rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.3);
+}
+
+#categories .category-card.active::after {
+  color: rgba(255,255,255,.65);
+}
+
+/* ترتيب الجوال */
+@media (max-width: 650px) {
+  #categories {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 12px;
+  }
+
+  #categories .category-card {
+    min-height: 172px;
+    padding: 18px 14px;
+    border-radius: 19px;
+  }
+
+  #categories .category-card h3 {
+    font-size: 16px;
+    margin-top: 21px;
+  }
+
+  #categories .category-card span {
+    font-size: 11px;
+  }
+}
+
+/* احترام إعدادات تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  #categories .category-card {
+    transition: none;
+  }
+}
+</style>
+<!-- AZAL CATEGORY MAKEOVER - END -->
+
 </body>
 </html>

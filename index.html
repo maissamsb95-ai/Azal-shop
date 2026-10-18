@@ -4078,5 +4078,152 @@ const newest = products
 </script>
 <!-- AZAL PRODUCT COLORS - END -->
 
+<!-- AZAL COLOR CIRCLES - START -->
+<style>
+.azal-colors {
+  background: #f8fbff;
+  padding: 13px;
+  border-radius: 14px;
+}
+
+.azal-color-select {
+  display: none;
+}
+
+.azal-color-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 10px 0;
+}
+
+.azal-color-dot {
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px #c6d3df;
+  cursor: pointer;
+  transition: .2s;
+  flex-shrink: 0;
+}
+
+.azal-color-dot:hover {
+  transform: scale(1.15);
+}
+
+.azal-color-dot.selected {
+  box-shadow: 0 0 0 3px #285f99;
+  transform: scale(1.1);
+}
+
+.azal-selected-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #173a63;
+  margin-top: 8px;
+}
+</style>
+
+<script>
+(function () {
+  const colorCodes = {
+    "أسود": "#222222",
+    "أبيض": "#ffffff",
+    "أوف وايت": "#f5f0e5",
+    "بيج": "#d7bea1",
+    "بني": "#82543c",
+    "رمادي": "#a3a3a3",
+    "سكني غامق": "#555963",
+    "كحلي": "#202f59",
+    "أزرق": "#4389c7",
+    "أزرق سماوي": "#9bd8f5",
+    "زهري": "#e9a8c2",
+    "خمري": "#79263d",
+    "زيتي": "#777b47",
+    "نهدي": "#b28ba9"
+  };
+
+  function buildColorCircles() {
+    document.querySelectorAll(
+      ".azal-colors"
+    ).forEach(wrapper => {
+
+      if (wrapper.querySelector(
+        ".azal-color-dots"
+      )) return;
+
+      const select = wrapper.querySelector(
+        ".azal-color-select"
+      );
+
+      if (!select) return;
+
+      const dots = document.createElement("div");
+      dots.className = "azal-color-dots";
+
+      const selectedName = document.createElement("div");
+      selectedName.className = "azal-selected-name";
+      selectedName.textContent = "لم يتم اختيار لون";
+
+      Array.from(select.options).forEach(option => {
+        if (!option.value) return;
+
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "azal-color-dot";
+        dot.style.backgroundColor =
+          colorCodes[option.value] || "#dddddd";
+
+        dot.title = option.value;
+        dot.setAttribute("aria-label", option.value);
+
+        dot.addEventListener("click", function () {
+          select.value = option.value;
+
+          select.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+
+          dots.querySelectorAll(
+            ".azal-color-dot"
+          ).forEach(el =>
+            el.classList.remove("selected")
+          );
+
+          dot.classList.add("selected");
+
+          selectedName.textContent =
+            "اللون المختار: " + option.value;
+        });
+
+        if (select.value === option.value) {
+          dot.classList.add("selected");
+          selectedName.textContent =
+            "اللون المختار: " + option.value;
+        }
+
+        dots.appendChild(dot);
+      });
+
+      wrapper.appendChild(dots);
+      wrapper.appendChild(selectedName);
+    });
+  }
+
+  const observer = new MutationObserver(
+    buildColorCircles
+  );
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  buildColorCircles();
+})();
+</script>
+<!-- AZAL COLOR CIRCLES - END -->
+
 </body>
 </html>

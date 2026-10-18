@@ -3819,5 +3819,264 @@ const newest = products
 </script>
 <!-- END AZAL NEW ARRIVALS -->
 
+<!-- AZAL PRODUCT COLORS - START -->
+<style>
+.azal-colors {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f2f7fc;
+  border: 1px solid #dce9f5;
+  border-radius: 12px;
+  direction: rtl;
+}
+
+.azal-colors label {
+  display: block;
+  color: #173a63;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.azal-color-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #b7cde0;
+  border-radius: 8px;
+  background: white;
+  color: #173a63;
+  font-family: inherit;
+  font-size: 13px;
+  outline-color: #588fc4;
+}
+
+.azal-color-select:focus {
+  border-color: #588fc4;
+}
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  // ألوان الشالات الأساسية
+  const scarfColors = [
+    "أسود", "أبيض", "أوف وايت", "بيج",
+    "بني", "رمادي", "كحلي", "أزرق",
+    "زهري", "خمري", "زيتي"
+  ];
+
+  // ألوان الملابس الأساسية
+  const basicColors = [
+    "أسود", "أبيض", "بيج", "بني",
+    "رمادي", "كحلي", "زهري", "خمري"
+  ];
+
+  // رقم المنتج : الألوان المتوفرة
+  const productColors = {
+    // الشالات
+    57: scarfColors, // شال قطن كويتي سادة
+    6: scarfColors,  // شال مودال
+    5: scarfColors,  // شال شيفون
+
+    // مكملات الحجاب
+    60: ["أسود", "أبيض"], // معاصم دانتيل
+    56: ["أسود", "أبيض"], // قطعة طويلة بيسك كت
+    25: ["أبيض", "أسود"], // قبة قميص
+    24: ["أبيض", "أسود"], // بلوزة بدي نص كم
+    23: ["أبيض", "أسود"], // بلوزة بدي كت
+
+    // ملابس الصلاة
+    48: [
+      "بني", "رمادي", "أزرق سماوي",
+      "كحلي", "بيج", "أسود", "خمري",
+      "زهري", "سكني غامق"
+    ],
+
+    3: basicColors, // اسدال ستاتي طبقتين
+
+    47: [
+      "خمري", "أسود", "أبيض",
+      "بيج", "بني", "رمادي",
+      "كحلي", "زهري"
+    ],
+
+    // الشنط والجزادين
+    29: [
+      "أسود", "زهري", "رمادي", "بني"
+    ],
+
+    28: [
+      "أسود", "زهري", "رمادي", "نهدي"
+    ]
+  };
+
+  const selections = {};
+
+  function createColorPicker(id) {
+    const colors = productColors[id];
+    if (!colors) return null;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "azal-colors";
+
+    const label = document.createElement("label");
+    label.textContent = "🎨 اختاري لون المنتج";
+
+    const select = document.createElement("select");
+    select.className = "azal-color-select";
+    select.dataset.productId = id;
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "اختاري اللون المطلوب";
+    select.appendChild(placeholder);
+
+    colors.forEach(color => {
+      const option = document.createElement("option");
+      option.value = color;
+      option.textContent = color;
+      select.appendChild(option);
+    });
+
+    select.value = selections[id] || "";
+
+    select.addEventListener("change", function () {
+      selections[id] = this.value;
+    });
+
+    wrapper.append(label, select);
+    return wrapper;
+  }
+
+  function addColorPickers() {
+    document.querySelectorAll(
+      ".product, .azal-new-card"
+    ).forEach(card => {
+
+      const button = Array.from(
+        card.querySelectorAll("button")
+      ).find(btn =>
+        /addToCart\s*\(\s*\d+\s*\)/.test(
+          btn.getAttribute("onclick") || ""
+        )
+      );
+
+      if (!button) return;
+
+      const match = (
+        button.getAttribute("onclick") || ""
+      ).match(/addToCart\s*\(\s*(\d+)\s*\)/);
+
+      if (!match) return;
+
+      const id = Number(match[1]);
+
+      if (!productColors[id]) return;
+
+      if (card.querySelector(".azal-colors")) return;
+
+      const picker = createColorPicker(id);
+
+      if (picker) {
+        button.parentNode.insertBefore(
+          picker,
+          button
+        );
+      }
+    });
+  }
+
+  // نحتفظ بوظيفة الإضافة الأصلية
+  const originalAddToCart = window.addToCart;
+
+  window.addToCart = function (id) {
+    id = Number(id);
+
+    // المنتجات العادية تبقى كما هي
+    if (!productColors[id]) {
+      return originalAddToCart(id);
+    }
+
+    const color = selections[id];
+
+    if (!color) {
+      alert("اختاري لون المنتج أولًا 💗");
+      return;
+    }
+
+    const product = products.find(
+      p => Number(p.id) === id
+    );
+
+    if (!product) return;
+
+    const itemName =
+      product.name + " - اللون: " + color;
+
+    // كل لون يبقى منفصلًا داخل السلة
+    const existing = cart.find(
+      item =>
+        Number(item.id) === id &&
+        item.color === color
+    );
+
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({
+        id: product.id,
+        name: itemName,
+        color: color,
+        price: Number(product.price || 0),
+        image_url: product.image_url,
+        qty: 1
+      });
+    }
+
+    saveCart();
+    showToast("تمت إضافة اللون " + color + " للسلة 🛒");
+  };
+
+  // إضافة قوائم الألوان بعد عرض المنتجات
+  const previousRenderProducts = window.renderProducts;
+
+  if (typeof previousRenderProducts === "function") {
+    window.renderProducts = function () {
+      const result = previousRenderProducts.apply(
+        this, arguments
+      );
+      addColorPickers();
+      return result;
+    };
+  }
+
+  // يشمل المنتجات الجديدة أيضًا
+  const observer = new MutationObserver(function () {
+    addColorPickers();
+  });
+
+  const productsBox = document.getElementById("products");
+  const newBox = document.getElementById("azalNewGrid");
+
+  if (productsBox) {
+    observer.observe(productsBox, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  if (newBox) {
+    observer.observe(newBox, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  addColorPickers();
+})();
+</script>
+<!-- AZAL PRODUCT COLORS - END -->
+
 </body>
 </html>

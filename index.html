@@ -4225,5 +4225,71 @@ const newest = products
 </script>
 <!-- AZAL COLOR CIRCLES - END -->
 
+<!-- AZAL CONTACT NUMBER - START -->
+<style>
+.azal-contact-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 20px;
+  border: 1px solid #dce7f0;
+  border-radius: 30px;
+  background: #fff;
+  color: #173a63;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: .2s;
+}
+
+.azal-contact-link:hover {
+  background: #eaf3fb;
+  transform: translateY(-2px);
+}
+
+.azal-contact-link svg {
+  width: 21px;
+  height: 21px;
+}
+</style>
+
+<script>
+(function () {
+  if (document.getElementById("azalContactNumber")) return;
+
+  const instagram = document.getElementById("azalInstagram");
+  if (!instagram) return;
+
+  const link = document.createElement("a");
+  link.id = "azalContactNumber";
+  link.className = "azal-contact-link";
+
+  link.href = "https://wa.me/972566931585";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+
+  link.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.8"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.6A8.5 8.5 0 1 1 21 11.5Z"/>
+      <path d="M9 8.5c.5 3 3 5.5 6 6l1.5-1.5"/>
+    </svg>
+    <span>للتواصل والاستفسار: +972 56 693 1585</span>
+  `;
+
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText =
+    "text-align:center;padding:0 12px 20px;";
+
+  wrapper.appendChild(link);
+
+  const instagramWrapper = instagram.parentElement;
+  instagramWrapper.insertAdjacentElement("afterend", wrapper);
+})();
+</script>
+<!-- AZAL CONTACT NUMBER - END -->
+
 </body>
 </html>

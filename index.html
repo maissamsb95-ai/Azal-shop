@@ -4631,6 +4631,60 @@ const newest = products
 </script>
 <!-- AZAL QUICK VIEW - END -->
 
+<!-- AZAL ROTATING TOPBAR - START -->
+<style>
+.topbar {
+  transition: background-color .3s ease;
+}
+
+.azal-topbar-message {
+  display: inline-block;
+  transition: opacity .3s ease;
+}
+
+.azal-topbar-message.azal-fade {
+  opacity: 0;
+}
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  const topbar = document.querySelector(".topbar");
+  if (!topbar) return;
+
+  // منع تشغيل الميزة مرتين
+  if (topbar.dataset.azalRotating === "true") return;
+  topbar.dataset.azalRotating = "true";
+
+  const messages = [
+    "🦋 وصل الجديد إلى أزل",
+    "💗 تسوّقي إطلالتك المفضلة من AZAL SHOP",
+    "🚚 توصيل لجميع المناطق",
+    "✨ YOUR STYLE YOUR AZAL"
+  ];
+
+  const message = document.createElement("span");
+  message.className = "azal-topbar-message";
+  message.textContent = messages[0];
+
+  topbar.replaceChildren(message);
+
+  let index = 0;
+
+  setInterval(function () {
+    message.classList.add("azal-fade");
+
+    setTimeout(function () {
+      index = (index + 1) % messages.length;
+      message.textContent = messages[index];
+      message.classList.remove("azal-fade");
+    }, 300);
+  }, 4000);
+})();
+</script>
+<!-- AZAL ROTATING TOPBAR - END -->
 
 </body>
 </html>

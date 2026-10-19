@@ -4880,5 +4880,129 @@ const newest = products
 </script>
 <!-- AZAL COMPLETE THE LOOK - END -->
 
+<!-- AZAL PRODUCT SORT - START -->
+<style>
+.azal-sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+  direction: rtl;
+}
+
+.azal-sort-bar label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #173a63;
+}
+
+.azal-sort-select {
+  background: #fff;
+  color: #173a63;
+  border: 1px solid #d7e4f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  outline-color: #d99bbf;
+}
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  const grid = document.getElementById("products");
+
+  if (!grid || typeof renderProducts !== "function") {
+    return;
+  }
+
+  if (document.getElementById("azalSortSelect")) {
+    return;
+  }
+
+  const bar = document.createElement("div");
+  bar.className = "azal-sort-bar";
+
+  const label = document.createElement("label");
+  label.textContent = "✨ ترتيب المنتجات:";
+  label.htmlFor = "azalSortSelect";
+
+  const select = document.createElement("select");
+  select.id = "azalSortSelect";
+  select.className = "azal-sort-select";
+
+  const options = [
+    ["default", "الترتيب العادي"],
+    ["newest", "الأحدث أولًا"],
+    ["low", "السعر: من الأقل للأعلى"],
+    ["high", "السعر: من الأعلى للأقل"]
+  ];
+
+  options.forEach(function (entry) {
+    const option = document.createElement("option");
+    option.value = entry[0];
+    option.textContent = entry[1];
+    select.appendChild(option);
+  });
+
+  bar.append(label, select);
+  grid.parentNode.insertBefore(bar, grid);
+
+  const originalRender = renderProducts;
+
+  renderProducts = function () {
+    if (typeof products === "undefined") {
+      return originalRender();
+    }
+
+    const originalProducts = products;
+    const mode = select.value;
+
+    if (mode === "default") {
+      return originalRender();
+    }
+
+    products = [...originalProducts];
+
+    if (mode === "newest") {
+      products.sort(function (a, b) {
+        return Number(b.id) - Number(a.id);
+      });
+    }
+
+    if (mode === "low") {
+      products.sort(function (a, b) {
+        return Number(a.price || 0) -
+               Number(b.price || 0);
+      });
+    }
+
+    if (mode === "high") {
+      products.sort(function (a, b) {
+        return Number(b.price || 0) -
+               Number(a.price || 0);
+      });
+    }
+
+    try {
+      return originalRender();
+    } finally {
+      products = originalProducts;
+    }
+  };
+
+  select.addEventListener("change", function () {
+    renderProducts();
+  });
+
+  renderProducts();
+})();
+</script>
+<!-- AZAL PRODUCT SORT - END -->
+
 </body>
 </html>

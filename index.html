@@ -4291,5 +4291,345 @@ const newest = products
 </script>
 <!-- AZAL CONTACT NUMBER - END -->
 
+<!-- AZAL QUICK VIEW - START -->
+<style>
+.azal-quick-btn {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 11px;
+  border: 1px solid #b9d1e5;
+  border-radius: 9px;
+  background: #f1f7fd;
+  color: #173a63;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.azal-quick-btn:hover {
+  background: #dfedfa;
+}
+.azal-quick-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(12, 30, 52, .72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+.azal-quick-modal {
+  position: relative;
+  width: min(850px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 20px;
+  direction: rtl;
+  box-shadow: 0 20px 70px #0004;
+}
+.azal-quick-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.azal-quick-photo {
+  width: 100%;
+  height: 100%;
+  max-height: 520px;
+  min-height: 300px;
+  object-fit: cover;
+  background: #edf4fa;
+}
+.azal-quick-info {
+  padding: 35px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+}
+.azal-quick-info small {
+  color: #7896af;
+  letter-spacing: 2px;
+}
+.azal-quick-info h2 {
+  color: #173a63;
+  margin: 0;
+  font-size: 25px;
+}
+.azal-quick-price {
+  color: #275b8b;
+  font-size: 23px;
+  font-weight: 800;
+}
+.azal-quick-desc {
+  color: #687e91;
+  line-height: 1.9;
+  font-size: 14px;
+  white-space: pre-line;
+}
+.azal-quick-close {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  border: 0;
+  background: white;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  font-size: 24px;
+  cursor: pointer;
+}
+.azal-quick-buy {
+  background: #173a63;
+  color: #fff;
+  padding: 14px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.azal-quick-buy:disabled {
+  background: #aab8c5;
+  cursor: not-allowed;
+}
+.azal-quick-color {
+  padding: 11px;
+  border: 1px solid #c9d9e7;
+  border-radius: 9px;
+  width: 100%;
+  font: inherit;
+  background: #fff;
+}
+@media(max-width:650px) {
+  .azal-quick-layout {
+    grid-template-columns: 1fr;
+  }
+  .azal-quick-photo {
+    height: 260px;
+    min-height: 0;
+  }
+  .azal-quick-info {
+    padding: 22px;
+  }
+}
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  let activeOverlay = null;
+  let previousOverflow = "";
+
+  function closeQuickView() {
+    if (activeOverlay) {
+      activeOverlay.remove();
+      activeOverlay = null;
+      document.body.style.overflow = previousOverflow;
+    }
+  }
+
+  function getProduct(id) {
+    if (typeof products === "undefined") return null;
+    return products.find(p => Number(p.id) === Number(id));
+  }
+
+  function getOriginalSelect(id) {
+    const selectors = document.querySelectorAll(
+      '.azal-color-select'
+    );
+
+    return Array.from(selectors).find(
+      el => Number(el.dataset.productId) === Number(id)
+    );
+  }
+
+  function openQuickView(id) {
+    const product = getProduct(id);
+    if (!product) return;
+
+    closeQuickView();
+
+    const overlay = document.createElement("div");
+    overlay.className = "azal-quick-overlay";
+
+    const modal = document.createElement("div");
+    modal.className = "azal-quick-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "تفاصيل المنتج");
+
+    const close = document.createElement("button");
+    close.className = "azal-quick-close";
+    close.textContent = "×";
+    close.setAttribute("aria-label", "إغلاق");
+    close.onclick = closeQuickView;
+
+    const layout = document.createElement("div");
+    layout.className = "azal-quick-layout";
+
+    const photo = document.createElement("img");
+    photo.className = "azal-quick-photo";
+    photo.src = product.image_url || "";
+    photo.alt = product.name || "منتج";
+
+    const info = document.createElement("div");
+    info.className = "azal-quick-info";
+
+    const label = document.createElement("small");
+    label.textContent = "AZAL SHOP • QUICK VIEW";
+
+    const name = document.createElement("h2");
+    name.textContent = product.name || "منتج";
+
+    const price = document.createElement("div");
+    price.className = "azal-quick-price";
+    price.textContent = Number(product.price || 0) + " ₪";
+
+    const description = document.createElement("div");
+    description.className = "azal-quick-desc";
+    description.textContent =
+      product.description || "قطعة مختارة لكِ من أزل 💙";
+
+    const buy = document.createElement("button");
+    buy.className = "azal-quick-buy";
+
+    const available = Number(product.stock || 0) > 0;
+    buy.textContent = available ? "أضيفي للسلة 🛒" : "غير متوفر";
+    buy.disabled = !available;
+
+    const originalSelect = getOriginalSelect(id);
+    let colorSelect = null;
+
+    if (originalSelect) {
+      const colorLabel = document.createElement("label");
+      colorLabel.textContent = "اختاري اللون:";
+
+      colorSelect = document.createElement("select");
+      colorSelect.className = "azal-quick-color";
+
+      Array.from(originalSelect.options).forEach(option => {
+        const copy = document.createElement("option");
+        copy.value = option.value;
+        copy.textContent = option.textContent;
+        colorSelect.appendChild(copy);
+      });
+
+      colorSelect.value = originalSelect.value || "";
+
+      info.appendChild(colorLabel);
+      info.appendChild(colorSelect);
+    }
+
+    buy.onclick = function () {
+      if (colorSelect) {
+        if (!colorSelect.value) {
+          alert("اختاري اللون أولًا 💗");
+          return;
+        }
+
+        const select = getOriginalSelect(id);
+
+        if (!select) {
+          alert("تعذر تحديد اللون، حاولي من بطاقة المنتج.");
+          return;
+        }
+
+        select.value = colorSelect.value;
+        select.dispatchEvent(
+          new Event("change", { bubbles: true })
+        );
+      }
+
+      if (typeof addToCart === "function") {
+        addToCart(Number(id));
+        closeQuickView();
+      }
+    };
+
+    info.prepend(label, name, price, description);
+    info.appendChild(buy);
+
+    layout.appendChild(photo);
+    layout.appendChild(info);
+    modal.appendChild(close);
+    modal.appendChild(layout);
+    overlay.appendChild(modal);
+
+    overlay.addEventListener("click", function (event) {
+      if (event.target === overlay) closeQuickView();
+    });
+
+    previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.body.appendChild(overlay);
+    activeOverlay = overlay;
+    close.focus();
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") closeQuickView();
+  });
+
+  function addQuickButtons() {
+    document.querySelectorAll(
+      ".product, .azal-new-card"
+    ).forEach(card => {
+      if (card.querySelector(".azal-quick-btn")) return;
+
+      const addButton = Array.from(
+        card.querySelectorAll("button")
+      ).find(btn =>
+        /addToCart\s*\(\s*\d+\s*\)/.test(
+          btn.getAttribute("onclick") || ""
+        )
+      );
+
+      if (!addButton) return;
+
+      const match = addButton
+        .getAttribute("onclick")
+        .match(/addToCart\s*\(\s*(\d+)\s*\)/);
+
+      if (!match) return;
+
+      const id = Number(match[1]);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "azal-quick-btn";
+      button.textContent = "عرض التفاصيل ↗";
+      button.onclick = () => openQuickView(id);
+
+      addButton.parentNode.insertBefore(
+        button, addButton
+      );
+    });
+  }
+
+  const observer = new MutationObserver(addQuickButtons);
+
+  const productAreas = [
+    document.getElementById("products"),
+    document.getElementById("azalNewGrid")
+  ];
+
+  productAreas.forEach(area => {
+    if (area) {
+      observer.observe(area, {
+        childList: true,
+        subtree: true
+      });
+    }
+  });
+
+  addQuickButtons();
+})();
+</script>
+<!-- AZAL QUICK VIEW - END -->
+
 </body>
 </html>

@@ -5004,5 +5004,184 @@ const newest = products
 </script>
 <!-- AZAL PRODUCT SORT - END -->
 
+<!-- AZAL SALE DISPLAY - START -->
+<style>
+.azal-sale-prices {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 8px 0;
+  direction: rtl;
+}
+.azal-sale-old {
+  color: #999;
+  text-decoration: line-through;
+  font-size: 13px;
+}
+.azal-sale-new {
+  color: #c04478;
+  font-weight: 800;
+  font-size: 18px;
+}
+.azal-sale-percent {
+  display: inline-block;
+  background: #fce7f1;
+  color: #a72f66;
+  border-radius: 20px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: bold;
+}
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  if (typeof renderProducts !== "function") return;
+
+  function decorate(container) {
+    if (!container || typeof products === "undefined") return;
+
+    container.querySelectorAll(
+      ".product, .azal-new-card"
+    ).forEach(function (card) {
+      const button = Array.from(
+        card.querySelectorAll("button")
+      ).find(function (b) {
+        return /addToCart\s*\(\s*\d+\s*\)/.test(
+          b.getAttribute("onclick") || ""
+        );
+      });
+
+      if (!button) return;
+
+      const match = (button.getAttribute("onclick") || "")
+        .match(/addToCart\s*\(\s*(\d+)\s*\)/);
+
+      if (!match) return;
+
+      const product = products.find(function (p) {
+        return Number(p.id) === Number(match[1]);
+      });
+
+      if (!product) return;
+
+      const oldPrice = Number(product.original_price);
+      const newPrice = Number(product.price);
+
+      const onSale =
+        product.original_price != null &&
+        Number.isFinite(oldPrice) &&
+        Number.isFinite(newPrice) &&
+        oldPrice > 0 &&
+        newPrice >= 0 &&
+        newPrice < oldPrice;
+
+      if (!onSale) return;
+
+      const priceBox = card.querySelector(
+        ".price, .azal-new-price"
+      );
+
+      if (!priceBox) return;
+
+      const percentage = Math.round(
+        (1 - newPrice / oldPrice) * 100
+      );
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "azal-sale-prices";
+
+      const old = document.createElement("span");
+      old.className = "azal-sale-old";
+      old.textContent = oldPrice.toFixed(2) + " ₪";
+
+      const current = document.createElement("span");
+      current.className = "azal-sale-new";
+      current.textContent = newPrice.toFixed(2) + " ₪";
+
+      const badge = document.createElement("span");
+      badge.className = "azal-sale-percent";
+      badge.textContent = "خصم " + percentage + "% 🎀";
+
+      wrapper.append(old, current, badge);
+      priceBox.replaceChildren(wrapper);
+    });
+  }
+
+  const previousRender = renderProducts;
+
+  renderProducts = function () {
+    const result = previousRender.apply(this, arguments);
+
+    decorate(document.getElementById("products"));
+    decorate(document.getElementById("azalNewGrid"));
+
+    return result;
+  };
+
+  // عرض السعر القديم داخل نافذة التفاصيل أيضًا
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".azal-quick-btn")) return;
+
+    queueMicrotask(function () {
+      const modal = document.querySelector(
+        ".azal-quick-modal"
+      );
+      if (!modal) return;
+
+      const card = event.target.closest(
+        ".product, .azal-new-card"
+      );
+      if (!card) return;
+
+      const addButton = Array.from(
+        card.querySelectorAll("button")
+      ).find(function (b) {
+        return /addToCart\s*\(\s*\d+\s*\)/.test(
+          b.getAttribute("onclick") || ""
+        );
+      });
+
+      if (!addButton) return;
+
+      const match = (addButton.getAttribute("onclick") || "")
+        .match(/addToCart\s*\(\s*(\d+)\s*\)/);
+
+      if (!match) return;
+
+      const product = products.find(function (p) {
+        return Number(p.id) === Number(match[1]);
+      });
+
+      if (!product || product.original_price == null) return;
+
+      const oldPrice = Number(product.original_price);
+      const newPrice = Number(product.price);
+
+      if (
+        !Number.isFinite(oldPrice) ||
+        !Number.isFinite(newPrice) ||
+        oldPrice <= newPrice
+      ) return;
+
+      const priceBox = modal.querySelector(
+        ".azal-quick-price"
+      );
+      if (!priceBox) return;
+
+      const old = document.createElement("span");
+      old.className = "azal-sale-old";
+      old.textContent = oldPrice.toFixed(2) + " ₪";
+
+      priceBox.prepend(old, "  ");
+    });
+  });
+})();
+</script>
+<!-- AZAL SALE DISPLAY - END -->
+
 </body>
 </html>

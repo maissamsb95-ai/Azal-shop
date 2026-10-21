@@ -1656,6 +1656,133 @@ checkSession();
 })();
 </script>
 <!-- AZAL OFFERS ADMIN - END -->
+<!-- AZAL FEATURED ADMIN - START -->
+<script>
+(function () {
+  const tabs = document.querySelector(".tabs");
+  const container = document.querySelector(".container");
+  if (!tabs || !container) return;
 
+  const tab = document.createElement("button");
+  tab.className = "tab";
+  tab.textContent = "مختارات من أزل 🦋";
+  tabs.appendChild(tab);
+
+  const panel = document.createElement("section");
+  panel.id = "azalFeaturedPanel";
+  panel.className = "panel";
+
+  panel.innerHTML = `
+    <div class="card">
+      <h3>مختارات من أزل 🦋</h3>
+      <p>اختاري أي عدد من المنتجات لعرضها في مختارات أزل.</p>
+      <div id="azalFeaturedList"></div>
+      <p id="azalFeaturedCount"></p>
+      <button class="btn" id="azalFeaturedSave">
+        حفظ مختارات أزل
+      </button>
+    </div>
+  `;
+
+  container.appendChild(panel);
+
+  let selected = new Set();
+
+  async function loadFeatured() {
+    const list = document.getElementById("azalFeaturedList");
+    list.textContent = "جاري تحميل المنتجات...";
+
+    const { data, error } = await sb
+      .from("Azal shop")
+      .select("id,name,image_url,is_featured")
+      .order("id", { ascending: false });
+
+    if (error) {
+      list.textContent = "تعذر التحميل: " + error.message;
+      return;
+    }
+
+    selected = new Set(
+      (data || []).filter(p => p.is_featured).map(p => p.id)
+    );
+
+    list.innerHTML = "";
+
+    (data || []).forEach(p => {
+      const row = document.createElement("label");
+      row.className = "azal-pick-item";
+
+      const img = document.createElement("img");
+      img.src = p.image_url || "";
+      img.alt = p.name || "";
+
+      const name = document.createElement("span");
+      name.textContent = p.name || "بدون اسم";
+
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.checked = selected.has(p.id);
+
+      check.onchange = () => {
+        if (check.checked) selected.add(p.id);
+        else selected.delete(p.id);
+        updateCount();
+      };
+
+      row.append(img, name, check);
+      list.appendChild(row);
+    });
+
+    updateCount();
+  }
+
+  function updateCount() {
+    document.getElementById("azalFeaturedCount")
+      .textContent = `تم اختيار ${selected.size} منتج`;
+  }
+
+  document.getElementById("azalFeaturedSave").onclick =
+    async function () {
+      const button = this;
+      button.disabled = true;
+
+      const { data, error } = await sb
+        .from("Azal shop")
+        .select("id,is_featured");
+
+      if (error) {
+        alert("تعذر التحميل: " + error.message);
+        button.disabled = false;
+        return;
+      }
+
+      for (const p of data || []) {
+        const shouldFeature = selected.has(p.id);
+        if (Boolean(p.is_featured) === shouldFeature) continue;
+
+        const result = await sb
+          .from("Azal shop")
+          .update({ is_featured: shouldFeature })
+          .eq("id", p.id);
+
+        if (result.error) {
+          alert("تعذر الحفظ: " + result.error.message);
+          button.disabled = false;
+          return;
+        }
+      }
+
+      button.disabled = false;
+      alert("تم حفظ مختارات أزل 🦋");
+      await loadFeatured();
+    };
+
+  tab.onclick = () => {
+    showTab("azalFeaturedPanel", tab);
+    loadFeatured();
+  };
+})();
+</script>
+<!-- AZAL FEATURED ADMIN - END -->
 </body>
 </html>

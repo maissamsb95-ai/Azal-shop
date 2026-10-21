@@ -5289,5 +5289,88 @@ const newest = products
 })();
 </script>
 <!-- AZAL MANUAL FEATURED - END -->
+  <!-- AZAL LUXURY HERO - START -->
+<style>
+/* خلفية أزل الجديدة */
+.hero {
+  background: linear-gradient(
+    125deg,
+    #f7faff 0%,
+    #fff0f7 52%,
+    #edf5ff 100%
+  );
+}
+
+/* لمسة ناعمة خلف اسم أزل */
+.hero::before {
+  background: radial-gradient(
+    circle,
+    rgba(245, 177, 207, 0.20),
+    transparent 70%
+  );
+  border: none;
+  pointer-events: none;
+}
+
+/* اسم المتجر */
+.hero h1 {
+  color: #183c67;
+  text-shadow: 3px 5px 20px rgba(228, 145, 185, 0.18);
+}
+
+/* العنوان والوصف */
+.hero h2 {
+  color: #345477;
+  font-weight: 600;
+}
+
+.hero p {
+  color: #687d95;
+}
+
+/* زر التسوق */
+.hero .btn-primary {
+  background: linear-gradient(110deg, #183c67, #355d8b);
+  color: white;
+  border-radius: 30px;
+  padding: 15px 35px;
+  box-shadow: 0 8px 22px rgba(24, 60, 103, 0.16);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.hero .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(24, 60, 103, 0.24);
+}
+
+/* لمسة وردية للكرت */
+.hero .floating-card {
+  border: 1px solid #f4d6e6;
+  border-radius: 18px;
+}
+
+/* ظهور ناعم للعنوان */
+@keyframes azalHeroAppear {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-copy {
+  animation: azalHeroAppear .8s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy {
+    animation: none;
+  }
+}
+</style>
+<!-- AZAL LUXURY HERO - END -->
 </body>
 </html>

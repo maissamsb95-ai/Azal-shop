@@ -1229,8 +1229,23 @@ async function loadProducts(){
   renderCategories();
   renderProducts();
 }
-
 function renderCategories(){
+  const box = document.getElementById("categories");
+
+  box.innerHTML = categoryList.map((cat, index) => {
+    if (cat === "الكل") return "";
+
+    return `
+      <button class="category-card ${cat === currentCategory ? "active" : ""}"
+        onclick="selectCategory(${index})">
+
+        <h3>${escapeHTML(cat)}</h3>
+
+        <span>تسوّقي القسم</span>
+      </button>
+    `;
+  }).join("");
+}
   const box=document.getElementById("categories");
 
   box.innerHTML=categoryList.map((cat,index)=>`

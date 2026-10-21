@@ -5181,6 +5181,113 @@ const newest = products
 })();
 </script>
 <!-- AZAL SALE DISPLAY - END -->
+<!-- AZAL MANUAL FEATURED - START -->
+<script>
+(function () {
+  "use strict";
 
+  if (typeof renderProducts !== "function") return;
+
+  const previousRender = renderProducts;
+
+  renderProducts = function () {
+    const result = previousRender.apply(this, arguments);
+
+    const search = document.getElementById("search");
+    const box = document.getElementById("products");
+
+    if (!search || !box) return result;
+
+    // لا نغير البحث أو عرض الأقسام
+    if (
+      currentCategory !== "الكل" ||
+      search.value.trim() !== ""
+    ) {
+      return result;
+    }
+
+    // المنتجات التي اختارتها صاحبة المتجر فقط
+    const picks = products.filter(function (p) {
+      return p.is_featured === true;
+    });
+
+    const title = document.getElementById("productsTitle");
+    const count = document.getElementById("productsCount");
+
+    if (title) title.textContent = "مختارات من أزل";
+
+    if (count) {
+      count.textContent = picks.length + " منتجات مختارة";
+    }
+
+    if (!picks.length) {
+      box.innerHTML =
+        '<div class="empty">قريبًا مختارات جديدة من أزل 🦋</div>';
+      return result;
+    }
+
+    box.innerHTML = picks.map(function (p) {
+      const oldPrice = Number(p.original_price);
+      const price = Number(p.price || 0);
+
+      const hasSale =
+        p.original_price != null &&
+        Number.isFinite(oldPrice) &&
+        oldPrice > price &&
+        price >= 0;
+
+      const priceHTML = hasSale
+        ? '<span class="azal-sale-old">' +
+            oldPrice.toFixed(2) + ' ₪</span> ' +
+          '<span class="azal-sale-new">' +
+            price.toFixed(2) + ' ₪</span> ' +
+          '<span class="azal-sale-percent">خصم ' +
+            Math.round((1 - price / oldPrice) * 100) +
+            '% 🎀</span>'
+        : price.toFixed(0) + ' ₪';
+
+      return `
+        <article class="product">
+          <div class="product-image">
+            <img
+              src="${escapeHTML(p.image_url || "")}"
+              alt="${escapeHTML(p.name || "منتج")}"
+              loading="lazy"
+              onerror="this.style.opacity='.15'">
+            <span class="product-badge">AZAL</span>
+          </div>
+
+          <div class="product-body">
+            <div class="product-cat">
+              ${escapeHTML(p.subcategory || p.category || "AZAL")}
+            </div>
+
+            <h3>${escapeHTML(p.name || "منتج")}</h3>
+
+            ${p.description
+              ? `<div class="product-description">
+                   ${escapeHTML(p.description)}
+                 </div>`
+              : ""}
+
+            <div class="price">${priceHTML}</div>
+
+            <button
+              class="add"
+              onclick="addToCart(${Number(p.id)})">
+              أضيفي للسلة
+            </button>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    return result;
+  };
+
+  renderProducts();
+})();
+</script>
+<!-- AZAL MANUAL FEATURED - END -->
 </body>
 </html>

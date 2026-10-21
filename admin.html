@@ -1325,11 +1325,7 @@ checkSession();
       checkbox.type="checkbox";
       checkbox.checked=selected.has(p.id);
 
-      checkbox.onchange=()=>{
-        if(checkbox.checked){
-          if(selected.size>=5){
-            checkbox.checked=false;
-            alert("تقدرين تختارين 5 منتجات فقط");
+      
             return;
           }
           selected.add(p.id);

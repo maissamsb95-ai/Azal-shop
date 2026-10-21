@@ -1325,9 +1325,8 @@ checkSession();
       checkbox.type="checkbox";
       checkbox.checked=selected.has(p.id);
 
-      
-            return;
-          }
+      checkbox.onchange=()=>{
+        if(checkbox.checked){
           selected.add(p.id);
         }else{
           selected.delete(p.id);

@@ -176,5 +176,184 @@ async function trackOrder(){
   }
 }
 </script>
+  
+<!-- AZAL ORDER REVIEWS -->
+<style>
+#azalReviewBox{
+  margin:24px 0 12px;
+  padding:20px 15px;
+  border:1px solid #f3c6db;
+  border-radius:18px;
+  background:#fff7fb;
+  text-align:center;
+}
+#azalReviewBox[hidden],
+#azalReviewForm[hidden]{display:none!important}
+.azalStars{
+  display:flex;
+  justify-content:center;
+  gap:5px;
+  direction:ltr;
+  margin:14px 0;
+}
+.azalStars button{
+  background:transparent;
+  color:#bec5d0;
+  padding:3px;
+  font-size:35px;
+  line-height:1;
+  border:0;
+}
+.azalStars button.active{color:#edb33e}
+#azalReviewBox textarea{
+  display:block;
+  width:100%;
+  min-height:95px;
+  padding:12px;
+  border:1px solid #e8cddd;
+  border-radius:12px;
+  resize:vertical;
+  font:14px Tahoma,Arial,sans-serif;
+  margin:12px 0;
+}
+#azalReviewMessage{font-size:14px}
+</style>
+
+<div id="azalReviewBox" hidden>
+  <h3>قيّمي تجربتك مع أزل 🦋</h3>
+  <p>رأيك بيساعدنا نكون أفضل!</p>
+
+  <div id="azalReviewForm">
+    <div class="azalStars" id="azalStars"></div>
+
+    <textarea id="azalReviewComment"
+      maxlength="1000"
+      placeholder="احكيلنا رأيك بالمنتجات والتوصيل..."></textarea>
+
+    <button id="azalSendReview" type="button">
+      إرسال التقييم 💗
+    </button>
+  </div>
+
+  <p id="azalReviewMessage" role="status"></p>
+</div>
+
+<script>
+(function(){
+  const box=document.getElementById("azalReviewBox");
+  const form=document.getElementById("azalReviewForm");
+  const stars=document.getElementById("azalStars");
+  const message=document.getElementById("azalReviewMessage");
+  const send=document.getElementById("azalSendReview");
+  const input=document.getElementById("token");
+
+  let rating=0;
+  let requestNumber=0;
+
+  for(let i=1;i<=5;i++){
+    const star=document.createElement("button");
+    star.type="button";
+    star.textContent="★";
+    star.setAttribute("aria-label",i+" نجوم");
+
+    star.onclick=()=>{
+      rating=i;
+      [...stars.children].forEach((el,index)=>{
+        el.classList.toggle("active",index<i);
+      });
+    };
+
+    stars.appendChild(star);
+  }
+
+  async function showReview(){
+    const current=++requestNumber;
+    const token=input.value.trim();
+    box.hidden=true;
+    message.textContent="";
+
+    if(!/^[0-9a-f-]{36}$/i.test(token))return;
+
+    try{
+      const {data,error}=await sb.rpc(
+        "azal_track_order",{p_token:token}
+      );
+
+      if(error||!data||!data.length)return;
+      if(current!==requestNumber)return;
+      if(data[0].order_status!=="completed")return;
+
+      const result=await sb.rpc(
+        "azal_review_status",{p_token:token}
+      );
+
+      if(result.error)throw result.error;
+      if(current!==requestNumber)return;
+
+      box.hidden=false;
+      form.hidden=Boolean(result.data);
+
+      if(result.data){
+        message.textContent=
+          "شكرًا إلك! تم تسجيل تقييم لهذا الطلب مسبقًا 💗";
+      }
+    }catch(error){
+      console.error("AZAL review:",error);
+    }
+  }
+
+  send.onclick=async()=>{
+    if(!rating){
+      message.textContent="اختاري عدد النجوم أولًا";
+      return;
+    }
+
+    send.disabled=true;
+    message.textContent="جاري إرسال التقييم...";
+
+    const token=input.value.trim();
+    const comment=document.getElementById(
+      "azalReviewComment"
+    ).value.trim();
+
+    try{
+      const {data,error}=await sb.rpc(
+        "azal_submit_review",{
+          p_token:token,
+          p_rating:rating,
+          p_comment:comment
+        }
+      );
+
+      if(error)throw error;
+
+      if(data==="success"){
+        form.hidden=true;
+        message.textContent=
+          "تم إرسال تقييمك بنجاح! شكرًا من أزل 🦋";
+      }else if(data==="already_reviewed"){
+        form.hidden=true;
+        message.textContent="تم تقييم هذا الطلب مسبقًا.";
+      }else{
+        message.textContent=
+          "تعذر إرسال التقييم. تأكدي أن الطلب مكتمل.";
+      }
+    }catch(error){
+      console.error(error);
+      message.textContent=
+        "حدث خطأ، حاولي مرة ثانية.";
+    }finally{
+      send.disabled=false;
+    }
+  };
+
+  document.getElementById("checkBtn")
+    .addEventListener("click",showReview);
+
+  if(input.value.trim())showReview();
+})();
+</script>
+<!-- END AZAL ORDER REVIEWS -->
+
 </body>
 </html>

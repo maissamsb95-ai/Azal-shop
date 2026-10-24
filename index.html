@@ -5383,5 +5383,94 @@ const newest = products
 }
 </style>
 <!-- AZAL LUXURY HERO - END -->
+
+<!-- AZAL TRACKING SHORTCUTS -->
+<style>
+.azal-copy-track {
+  display: inline-block;
+  margin: 10px 5px;
+  padding: 12px 18px;
+  background: #fff0f7;
+  color: #153a63;
+  border: 1px solid #eebbd3;
+  border-radius: 12px;
+  font: bold 14px Tahoma, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.azal-track-nav {
+  color: #b52e72 !important;
+  font-weight: bold !important;
+}
+</style>
+
+<script>
+(function () {
+  // زر التتبع في قائمة المتجر
+  const nav = document.querySelector(".navbar-inner");
+
+  if (nav && !document.getElementById("azalTrackNav")) {
+    const button = document.createElement("button");
+    button.id = "azalTrackNav";
+    button.className = "azal-track-nav";
+    button.textContent = "📦 تتبّع طلبي";
+
+    button.onclick = function () {
+      window.location.href = "track.html";
+    };
+
+    nav.appendChild(button);
+  }
+
+  // زر نسخ الرابط بعد تأكيد الطلب
+  const message = document.getElementById("message");
+  if (!message) return;
+
+  function addCopyButton() {
+    const link = message.querySelector(
+      'a[href^="track.html?token="]'
+    );
+
+    if (!link || message.querySelector(".azal-copy-track")) {
+      return;
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "azal-copy-track";
+    button.textContent = "📋 نسخ رابط التتبّع";
+
+    button.onclick = async function () {
+      const url = new URL(
+        link.getAttribute("href"),
+        window.location.href
+      ).href;
+
+      try {
+        await navigator.clipboard.writeText(url);
+        button.textContent = "✓ تم نسخ الرابط!";
+      } catch (error) {
+        window.prompt(
+          "انسخي رابط التتبّع من هنا:",
+          url
+        );
+      }
+    };
+
+    link.insertAdjacentElement("afterend", button);
+  }
+
+  const observer = new MutationObserver(addCopyButton);
+
+  observer.observe(message, {
+    childList: true,
+    subtree: true
+  });
+
+  addCopyButton();
+})();
+</script>
+<!-- END AZAL TRACKING SHORTCUTS -->
+
 </body>
 </html>

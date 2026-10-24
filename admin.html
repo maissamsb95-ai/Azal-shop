@@ -1784,5 +1784,109 @@ checkSession();
 })();
 </script>
 <!-- AZAL FEATURED ADMIN - END -->
+
+<!-- AZAL: New Orders Badge -->
+<style>
+.azal-new-orders-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e83e70;
+  color: white;
+  border-radius: 20px;
+  min-width: 22px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 6px;
+}
+.azal-order-notice {
+  background: #fff1f6;
+  color: #a92355;
+  border: 1px solid #f7c5d8;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+</style>
+
+<script>
+(function () {
+  const ordersTab = document.querySelector(
+    'button[onclick*="ordersPanel"]'
+  );
+  const ordersPanel = document.getElementById("ordersPanel");
+
+  if (!ordersTab || !ordersPanel) return;
+
+  const badge = document.createElement("span");
+  badge.className = "azal-new-orders-badge";
+  badge.style.display = "none";
+  ordersTab.appendChild(badge);
+
+  const notice = document.createElement("div");
+  notice.className = "azal-order-notice";
+  notice.style.display = "none";
+  notice.setAttribute("role", "status");
+  ordersPanel.insertBefore(notice, ordersPanel.firstChild);
+
+  let checking = false;
+
+  async function checkNewOrders() {
+    if (checking) return;
+    checking = true;
+
+    try {
+      const { count, error } = await sb
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "new");
+
+      if (error) {
+        console.error("AZAL orders badge:", error);
+        return;
+      }
+
+      const total = count || 0;
+      badge.textContent = total;
+      badge.style.display = total > 0 ? "inline-flex" : "none";
+
+      notice.textContent =
+        "🦋 يا سمسم، عندك " + total +
+        " طلب جديد! تعالي شيّكي عليهم 💗";
+      notice.style.display = total > 0 ? "block" : "none";
+    } catch (error) {
+      console.error("AZAL orders badge:", error);
+    } finally {
+      checking = false;
+    }
+  }
+
+  const dashboard = document.getElementById("dashboard");
+
+  if (dashboard) {
+    const observer = new MutationObserver(() => {
+      if (dashboard.style.display === "block") {
+        checkNewOrders();
+      }
+    });
+    observer.observe(dashboard, {
+      attributes: true,
+      attributeFilter: ["style"]
+    });
+  }
+
+  ordersTab.addEventListener("click", checkNewOrders);
+  window.addEventListener("focus", checkNewOrders);
+  setInterval(() => {
+    if (dashboard && dashboard.style.display === "block") {
+      checkNewOrders();
+    }
+  }, 30000);
+})();
+</script>
+<!-- END AZAL New Orders Badge -->
+
 </body>
 </html>

@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تتبّع طلبك | AZAL SHOP</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(150deg,#fdf0f7,#edf4ff);
+  font-family:Tahoma,Arial,sans-serif;
+  color:#153a63;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.card{
+  background:white;
+  border-radius:24px;
+  padding:30px 22px;
+  width:100%;
+  max-width:440px;
+  box-shadow:0 12px 40px #153a6317;
+  text-align:center;
+}
+.logo{font-size:27px;font-weight:bold}
+.subtitle{color:#8c6483;font-size:14px}
+h2{font-size:22px}
+input{
+  width:100%;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  margin:12px 0;
+}
+button,.back{
+  display:inline-block;
+  background:#153a63;
+  color:white;
+  border:0;
+  border-radius:12px;
+  padding:13px 22px;
+  cursor:pointer;
+  font-size:15px;
+  text-decoration:none;
+}
+button:disabled{opacity:.5}
+#result{margin:22px 0;text-align:right}
+.step{
+  padding:14px;
+  margin:10px 0;
+  background:#f3f5f9;
+  border-radius:12px;
+  color:#8b94a5;
+}
+.step.done{
+  background:#e5f6ee;
+  color:#237552;
+}
+.step.current{
+  background:#fff0f7;
+  color:#b52e72;
+  font-weight:bold;
+}
+.error{color:#ba3154;text-align:center}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">AZAL SHOP 🦋</div>
+  <p class="subtitle">Your style, your Azal</p>
+  <h2>تتبّعي طلبك 💗</h2>
+  <p>اعرفي وين وصل طلبك بكل سهولة</p>
+
+  <input id="token" placeholder="رمز التتبّع الخاص بطلبك">
+  <button id="checkBtn" onclick="trackOrder()">تتبّع الطلب</button>
+
+  <div id="result" role="status" aria-live="polite"></div>
+
+  <a class="back" href="index.html">العودة للمتجر</a>
+</div>
+
+<script>
+const sb = supabase.createClient(
+  "https://dyycupydbyqfpugtpwoa.supabase.co",
+  "sb_publishable_hYQzWO6VYm_DI_lamIPtAA_Q0fU967k"
+);
+
+const steps = [
+  ["new","تم استلام الطلب"],
+  ["confirmed","تم تأكيد الطلب"],
+  ["preparing","جاري تجهيز الطلب"],
+  ["shipped","الطلب في الطريق"],
+  ["completed","تم تسليم الطلب"]
+];
+
+const params = new URLSearchParams(location.search);
+const tokenFromLink = params.get("token");
+
+if(tokenFromLink){
+  document.getElementById("token").value = tokenFromLink;
+  trackOrder();
+}
+
+async function trackOrder(){
+  const token = document.getElementById("token").value.trim();
+  const box = document.getElementById("result");
+  const button = document.getElementById("checkBtn");
+
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token)){
+    box.innerHTML = '<p class="error">رمز التتبّع غير صحيح.</p>';
+    return;
+  }
+
+  box.textContent = "جاري البحث عن طلبك...";
+  button.disabled = true;
+
+  try {
+    const {data,error} = await sb.rpc("azal_track_order",{
+      p_token:token
+    });
+
+    if(error) throw error;
+
+    if(!data || !data.length){
+      box.innerHTML = '<p class="error">لم نجد طلبًا بهذا الرمز.</p>';
+      return;
+    }
+
+    const order = data[0];
+
+    if(order.order_status === "cancelled"){
+      box.innerHTML =
+        '<p class="error">تم إلغاء هذا الطلب. تواصلي مع المتجر للاستفسار.</p>';
+      return;
+    }
+
+    const current = steps.findIndex(
+      s => s[0] === order.order_status
+    );
+
+    if(current === -1){
+      box.textContent = "حالة الطلب غير متاحة حاليًا.";
+      return;
+    }
+
+    box.replaceChildren();
+
+    const heading = document.createElement("h3");
+    heading.textContent = "الطلب #" + order.order_id;
+    box.appendChild(heading);
+
+    steps.forEach((step,index)=>{
+      const item = document.createElement("div");
+      item.className = "step" +
+        (index < current ? " done" :
+        index === current ? " current" : "");
+
+      item.textContent =
+        (index <= current ? "✓ " : "○ ") + step[1];
+
+      box.appendChild(item);
+    });
+
+  }catch(error){
+    console.error(error);
+    box.innerHTML =
+      '<p class="error">تعذّر جلب حالة الطلب، حاولي لاحقًا.</p>';
+  }finally{
+    button.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

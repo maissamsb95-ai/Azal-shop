@@ -1893,10 +1893,10 @@ checkout=async function(){
   button.disabled=true;
   button.textContent=
     "جاري إرسال الطلب...";
-
+const trackingToken = crypto.randomUUID();
   const {data,error}=await sb
     .from("orders")
-    .insert({
+    .insert({tracking_token: trackingToken,
       customer_name,
       phone,
       address,
@@ -1931,9 +1931,20 @@ checkout=async function(){
     وسنتواصل معك لتأكيد الطلب.
     <br>
     رقم طلبك:
-    <strong>#${data.id}</strong>
-    <br>
-    نتمنى لك تجربة جميلة مع AZAL ✨
+   
+<strong>#${data.id}</strong>
+<br>
+نتمنى لك تجربة جميلة مع AZAL ✨
+<br><br>
+<a href="track.html?token=${trackingToken}"
+   style="display:inline-block;background:#153a63;color:white;
+   padding:12px 22px;border-radius:12px;text-decoration:none;
+   font-weight:bold;">
+  🦋 تتبّعي طلبك من هون
+</a>
+<br>
+<small>احتفظي برابط التتبّع لمعرفة حالة طلبك.</small>
+
   `;
 
   cart=[];

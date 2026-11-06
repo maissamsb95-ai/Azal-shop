@@ -1762,9 +1762,9 @@ renderProducts=function(){
           AZAL
         </span>
 
-        <button class="heart favorite-product \${isFavorite(p.id)?'is-active':''}"
-          onclick="toggleFavorite(\${Number(p.id)})"
-          aria-label="\${isFavorite(p.id)?'إزالة من المفضلة':'إضافة للمفضلة'}">♡</button>
+        <button class="heart favorite-product ${isFavorite(p.id)?'is-active':''}"
+          onclick="toggleFavorite(${Number(p.id)})"
+          aria-label="${isFavorite(p.id)?'إزالة من المفضلة':'إضافة للمفضلة'}">♡</button>
 
       </div>
 

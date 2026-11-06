@@ -5950,7 +5950,8 @@ const newest = products
     overlay.classList.add("open");
     document.body.style.overflow="hidden";
   };
-  closeFavorites=function(){
+  // Expose the close handler globally because the drawer buttons use inline onclick.
+  window.closeFavorites=function(){
     document.getElementById("favoritesOverlay")?.classList.remove("open");
     if(!document.getElementById("overlay")?.classList.contains("open"))document.body.style.overflow="";
   };

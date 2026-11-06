@@ -1264,6 +1264,7 @@ function renderCategories(){
 
 
 function selectCategory(index){
+  showFavoritesOnly=false;
   currentCategory=categoryList[index]||"الكل";
   renderCategories();
   renderProducts();
@@ -1673,6 +1674,7 @@ loadProducts();
 
 // ===== AZAL FAVORITES =====
 let favorites=JSON.parse(localStorage.getItem("azal_favorites")||"[]").map(String);
+let showFavoritesOnly=false;
 function isFavorite(id){return favorites.includes(String(id));}
 function updateFavoritesCount(){
   const el=document.getElementById("favoritesCount");
@@ -1700,7 +1702,9 @@ function openFavorites(){
   const target=document.getElementById("productsSection");
   if(target){
     currentCategory="الكل";
+    showFavoritesOnly=true;
     renderProducts();
+    document.getElementById("productsTitle").textContent="مفضلتي";
     target.scrollIntoView({behavior:"smooth",block:"start"});
     showToast("منتجاتك المفضلة: "+saved.length);
   }
@@ -1727,7 +1731,7 @@ renderProducts=function(){
        ${p.subcategory||""}`
       .toLowerCase();
 
-    return categoryOK && (!q || text.includes(q));
+    return categoryOK && (!q || text.includes(q)) && (!showFavoritesOnly || isFavorite(p.id));
   });
 
   document.getElementById("productsTitle").textContent=

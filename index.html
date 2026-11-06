@@ -1768,7 +1768,7 @@ renderProducts=function(){
 
         <button class="heart favorite-product ${isFavorite(p.id)?'is-active':''}"
           onclick="toggleFavorite(${Number(p.id)})"
-          aria-label="${isFavorite(p.id)?'إزالة من المفضلة':'إضافة للمفضلة'}">♡</button>
+          aria-label="${isFavorite(p.id)?'إزالة من المفضلة':'إضافة للمفضلة'}">${isFavorite(p.id)?'♥':'♡'}</button>
 
       </div>
 
@@ -5912,7 +5912,7 @@ const newest = products
     <div class="favorites-head">
       <div class="favorites-head-copy">
         <span class="favorites-kicker">AZAL YOUR FAVORITES</span>
-        <h2>مفضلتي 💗</h2>
+        <h2 dir="ltr" style="text-align:right">Favorites 💗</h2>
         <p>كل القطع اللي حبيتيها بمكان واحد</p>
       </div>
       <button class="favorites-close" type="button" onclick="closeFavorites()" aria-label="إغلاق المفضلة">×</button>

@@ -5858,5 +5858,113 @@ const newest = products
 </script>
 <!-- END AZAL WISHLIST FIX 2026-11-06 -->
 
+
+<!-- AZAL FAVORITES DRAWER 2026-11-06 -->
+<style>
+#favoritesOverlay{
+  position:fixed;inset:0;z-index:110;
+  display:none;background:rgba(13,27,39,.48);
+  backdrop-filter:blur(7px);
+}
+#favoritesOverlay.open{display:block}
+#favoritesDrawer{
+  position:absolute;right:0;top:0;width:min(440px,94%);
+  height:100%;overflow:auto;background:#fffdfd;
+  padding:24px 20px 30px;direction:rtl;
+  box-shadow:-18px 0 55px rgba(20,35,49,.16);
+  transform:translateX(105%);transition:transform .28s ease;
+  scrollbar-width:thin;scrollbar-color:#e8cbd5 transparent;
+}
+#favoritesOverlay.open #favoritesDrawer{transform:translateX(0)}
+.favorites-head{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:4px 0 18px;border-bottom:1px solid #f0e6e9;margin-bottom:12px;
+}
+.favorites-head-copy{display:flex;flex-direction:column;gap:4px}
+.favorites-kicker{color:#c17b94;font-size:9px;font-weight:800;letter-spacing:2px;direction:ltr;text-align:right}
+.favorites-head h2{margin:2px 0 0;color:#263e52;font-size:23px;font-weight:800}
+.favorites-head p{margin:0;color:#9a9da3;font-size:11px}
+.favorites-close{
+  width:34px;height:34px;border:1px solid #f0e6e9;border-radius:50%;
+  background:#fff;color:#7c8992;font-size:23px;line-height:1;cursor:pointer;
+}
+#favoritesDrawerItems .cart-row{align-items:center;gap:13px;padding:15px 0;border-bottom:1px solid #f2eaec}
+#favoritesDrawerItems .cart-row img{width:78px;height:91px;flex:0 0 78px;border-radius:11px;object-fit:cover;background:#f8f2f4}
+#favoritesDrawerItems .cart-info{min-width:0;text-align:right}
+#favoritesDrawerItems .cart-info b{display:block;color:#2b4052;font-size:13px;line-height:1.7}
+#favoritesDrawerItems .cart-price{margin-top:3px;color:#bd7891;font-size:12px;font-weight:800}
+.favorites-actions{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+.favorites-add-cart{
+  border:0;border-radius:8px;padding:7px 11px;
+  background:#153a63;color:#fff;font-size:11px;font-weight:700;
+}
+.favorites-remove{
+  border:0;background:none;color:#c27f96;font-size:11px;cursor:pointer;
+}
+.favorites-drawer-empty{
+  padding:48px 12px;text-align:center;color:#927d89;line-height:2;
+}
+.favorites-drawer-empty strong{display:block;color:#b65f83;font-size:17px}
+@media(max-width:700px){#favoritesDrawer{width:min(420px,94%);padding:21px 17px 26px}}
+</style>
+<div id="favoritesOverlay" onclick="if(event.target===this)closeFavorites()">
+  <aside id="favoritesDrawer" role="dialog" aria-modal="true" aria-label="مفضلتي">
+    <div class="favorites-head">
+      <div class="favorites-head-copy">
+        <span class="favorites-kicker">AZAL YOUR FAVORITES</span>
+        <h2>مفضلتي 💗</h2>
+        <p>كل القطع اللي حبيتيها بمكان واحد</p>
+      </div>
+      <button class="favorites-close" type="button" onclick="closeFavorites()" aria-label="إغلاق المفضلة">×</button>
+    </div>
+    <div id="favoritesDrawerItems"></div>
+  </aside>
+</div>
+<script>
+(function(){
+  "use strict";
+  function renderFavoritesDrawer(){
+    const box=document.getElementById("favoritesDrawerItems");
+    if(!box)return;
+    const saved=products.filter(p=>isFavorite(p.id));
+    if(!saved.length){
+      box.innerHTML='<div class="favorites-drawer-empty"><strong>مفضلتك تنتظرك هنا 💗</strong>ما عندك منتجات محفوظة حاليًا.<br>اضغطي على قلب أي منتج عشان تضيفينه 🦋</div>';
+      return;
+    }
+    box.innerHTML=saved.map(p=>`
+      <div class="cart-row">
+        <img src="${escapeHTML(p.image_url||"")}" alt="${escapeHTML(p.name||"منتج")}" onerror="this.style.opacity='.2'">
+        <div class="cart-info">
+          <b>${escapeHTML(p.name||"منتج")}</b>
+          <div class="cart-price">${Number(p.price||0).toFixed(0)} ₪</div>
+          <div class="favorites-actions">
+            <button class="favorites-add-cart" type="button" onclick="addToCart(${Number(p.id)});">أضيفي للسلة 🛒</button>
+            <button class="favorites-remove" type="button" onclick="toggleFavorite(${Number(p.id)})">إزالة ♡</button>
+          </div>
+        </div>
+      </div>`).join("");
+  }
+  openFavorites=function(){
+    renderFavoritesDrawer();
+    const overlay=document.getElementById("favoritesOverlay");
+    overlay.classList.add("open");
+    document.body.style.overflow="hidden";
+  };
+  closeFavorites=function(){
+    document.getElementById("favoritesOverlay")?.classList.remove("open");
+    if(!document.getElementById("overlay")?.classList.contains("open"))document.body.style.overflow="";
+  };
+  const previousToggle=toggleFavorite;
+  toggleFavorite=function(id){
+    previousToggle(id);
+    if(document.getElementById("favoritesOverlay")?.classList.contains("open"))renderFavoritesDrawer();
+  };
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape")closeFavorites();
+  });
+})();
+</script>
+<!-- END AZAL FAVORITES DRAWER 2026-11-06 -->
+
 </body>
 </html>

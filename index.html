@@ -1663,11 +1663,10 @@ loadProducts();
   document.head.appendChild(favicon);
 })();
 
-/* تهيئة عدادات السلة والمفضلة */
+/* تهيئة عداد السلة بعد تحميل عناصر الصفحة */
 (function(){
   const cartCount=document.getElementById("cartCount");
   if(cartCount) cartCount.textContent=cart.reduce((n,item)=>n+Number(item.qty||0),0);
-  updateFavoritesCount();
 })();
 
 
@@ -1680,6 +1679,7 @@ function updateFavoritesCount(){
   const el=document.getElementById("favoritesCount");
   if(el) el.textContent=favorites.length;
 }
+updateFavoritesCount();
 function toggleFavorite(id){
   const key=String(id);
   if(isFavorite(key)){

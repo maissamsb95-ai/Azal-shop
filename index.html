@@ -937,8 +937,12 @@ footer{
     </div>
 
     <div class="header-actions left">
+      <button class="icon favorites-trigger" onclick="openFavorites()" title="المفضلة" aria-label="فتح المفضلة">
+        <span aria-hidden="true">♡</span>
+        <span class="favorites-count" id="favoritesCount">0</span>
+      </button>
       <button class="icon cart-trigger" onclick="openCart()" title="سلة التسوق" aria-label="فتح سلة التسوق">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.1a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 1.9-1.4L22 8H6"/><path d="M9 20h.01M18 20h.01M9 8l1 5M15 8l-1 5"/></svg>
+        <span class="cart-emoji" aria-hidden="true">🛒</span>
         <span class="cart-count" id="cartCount">0</span>
       </button>
     </div>
@@ -1658,37 +1662,49 @@ loadProducts();
   document.head.appendChild(favicon);
 })();
 
-/* تحويل القلب العلوي إلى سلة */
+/* تهيئة عدادات السلة والمفضلة */
 (function(){
-  const cartButton=document.querySelector(
-    '.header-actions.left .icon'
-  );
-
-  if(cartButton){
-    cartButton.innerHTML=`
-      <svg width="23" height="23"
-        viewBox="0 0 24 24"
-        fill="none" aria-hidden="true">
-
-        <path
-          d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9
-          a2 2 0 0 0 1.9-1.4L21 8H7"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"/>
-
-        <circle cx="10" cy="20" r="1.2"
-          fill="currentColor"/>
-
-        <circle cx="18" cy="20" r="1.2"
-          fill="currentColor"/>
-      </svg>
-
-      <span class="cart-count" id="cartCount">0</span>
-    `;
-  }
+  const cartCount=document.getElementById("cartCount");
+  if(cartCount) cartCount.textContent=cart.reduce((n,item)=>n+Number(item.qty||0),0);
+  updateFavoritesCount();
 })();
+
+
+
+// ===== AZAL FAVORITES =====
+let favorites=JSON.parse(localStorage.getItem("azal_favorites")||"[]").map(String);
+function isFavorite(id){return favorites.includes(String(id));}
+function updateFavoritesCount(){
+  const el=document.getElementById("favoritesCount");
+  if(el) el.textContent=favorites.length;
+}
+function toggleFavorite(id){
+  const key=String(id);
+  if(isFavorite(key)){
+    favorites=favorites.filter(x=>x!==key);
+    showToast("تمت الإزالة من المفضلة");
+  }else{
+    favorites.push(key);
+    showToast("انضاف للمفضلة 🤍");
+  }
+  localStorage.setItem("azal_favorites",JSON.stringify(favorites));
+  updateFavoritesCount();
+  if(typeof renderProducts==="function") renderProducts();
+}
+function openFavorites(){
+  const saved=products.filter(p=>isFavorite(p.id));
+  if(!saved.length){
+    showToast("قائمة المفضلة فارغة حاليًا ♡");
+    return;
+  }
+  const target=document.getElementById("productsSection");
+  if(target){
+    currentCategory="الكل";
+    renderProducts();
+    target.scrollIntoView({behavior:"smooth",block:"start"});
+    showToast("منتجاتك المفضلة: "+saved.length);
+  }
+}
 
 /* عرض المنتجات + الوصف + إلغاء المخزون */
 renderProducts=function(){
@@ -1745,6 +1761,10 @@ renderProducts=function(){
         <span class="product-badge">
           AZAL
         </span>
+
+        <button class="heart favorite-product \${isFavorite(p.id)?'is-active':''}"
+          onclick="toggleFavorite(\${Number(p.id)})"
+          aria-label="\${isFavorite(p.id)?'إزالة من المفضلة':'إضافة للمفضلة'}">♡</button>
 
       </div>
 
@@ -5589,6 +5609,38 @@ const newest = products
   .cart{width:min(420px,94%);padding:22px 18px 26px}
   .cart-trigger{width:40px;height:40px}
   .cart-row img{width:70px;height:84px;flex-basis:70px}
+}
+
+
+
+/* Separate emoji cart and favorites controls */
+.header-actions.left{gap:7px}
+.favorites-trigger{
+  position:relative;display:grid;place-items:center;
+  width:42px;height:42px;border:1px solid #f0dfe5;
+  border-radius:50%;background:#fff;color:#cf829d;
+  font-size:27px;line-height:1;
+}
+.favorites-trigger:hover{background:#fff3f6}
+.favorites-count{
+  position:absolute;top:-3px;left:-4px;min-width:18px;height:18px;
+  padding:0 4px;display:grid;place-items:center;
+  border:2px solid #fff;border-radius:20px;
+  background:#d98da5;color:#fff;font-size:9px;font-weight:800;
+}
+.cart-trigger .cart-emoji{font-size:24px;line-height:1}
+.cart-trigger{border:1px solid #f0dfe5;border-radius:50%;background:#fff}
+.cart-trigger svg{display:none}
+.heart.favorite-product{
+  display:grid;place-items:center;cursor:pointer;color:#cf829d;
+  font-size:22px;line-height:1;box-shadow:0 2px 10px rgba(45,35,40,.08);
+  transition:transform .18s,background .18s,color .18s;
+}
+.heart.favorite-product:hover{transform:scale(1.08)}
+.heart.favorite-product.is-active{background:#fff0f4;color:#d65f83}
+@media(max-width:700px){
+  .favorites-trigger{width:39px;height:39px;font-size:25px}
+  .cart-trigger .cart-emoji{font-size:22px}
 }
 
 </style>

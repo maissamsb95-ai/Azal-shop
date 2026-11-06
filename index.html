@@ -5717,5 +5717,146 @@ const newest = products
 </script>
 <!-- END AZAL TRACKING SHORTCUTS -->
 
+
+<!-- AZAL WISHLIST FIX 2026-11-06 -->
+<style>
+.favorites-trigger > span[aria-hidden="true"]{color:#cf829d}
+.heart.favorite-product{
+  display:grid;place-items:center;cursor:pointer;
+  color:#cf829d;font-size:23px;line-height:1;
+  box-shadow:0 2px 10px rgba(45,35,40,.08);
+  transition:transform .18s,background .18s,color .18s;
+}
+.heart.favorite-product:hover{transform:scale(1.08)}
+.heart.favorite-product.is-active{
+  background:#fff0f4;color:#d65f83;
+}
+.favorites-empty{
+  grid-column:1/-1;padding:55px 18px;text-align:center;
+  border:1px dashed #efcbd8;border-radius:16px;
+  background:#fff8fb;color:#806979;line-height:2;
+}
+.favorites-empty strong{display:block;color:#b65f83;font-size:18px}
+</style>
+<script>
+(function(){
+  "use strict";
+
+  function updateFavoritesCount(){
+    const count=document.getElementById("favoritesCount");
+    if(count) count.textContent=String(favorites.length);
+  }
+
+  function favoriteCard(p){
+    const id=Number(p.id);
+    const active=isFavorite(id);
+    return `
+      <article class="product">
+        <div class="product-image">
+          <img src="${escapeHTML(p.image_url||"")}"
+               alt="${escapeHTML(p.name||"منتج")}"
+               loading="lazy"
+               onerror="this.style.opacity='.15'">
+          <span class="product-badge">AZAL</span>
+          <button type="button"
+            class="heart favorite-product ${active?"is-active":""}"
+            onclick="toggleFavorite(${id})"
+            aria-label="${active?"إزالة من المفضلة":"إضافة للمفضلة"}"
+            aria-pressed="${active}">${active?"♥":"♡"}</button>
+        </div>
+        <div class="product-body">
+          <div class="product-cat">${escapeHTML(p.subcategory||p.category||"AZAL")}</div>
+          <h3>${escapeHTML(p.name||"منتج")}</h3>
+          ${p.description?`<div class="product-description">${escapeHTML(p.description)}</div>`:""}
+          <div class="price">${Number(p.price||0).toFixed(0)} ₪</div>
+          <button class="add" onclick="addToCart(${id})">أضيفي للسلة</button>
+        </div>
+      </article>`;
+  }
+
+  const previousRender=renderProducts;
+  renderProducts=function(){
+    if(showFavoritesOnly){
+      const q=(document.getElementById("search")?.value||"").trim().toLowerCase();
+      const saved=products.filter(p=>{
+        const searchable=`${p.name||""} ${p.description||""} ${p.category||""} ${p.subcategory||""}`.toLowerCase();
+        return isFavorite(p.id)&&(!q||searchable.includes(q));
+      });
+      const title=document.getElementById("productsTitle");
+      const count=document.getElementById("productsCount");
+      const box=document.getElementById("products");
+      if(title) title.textContent="مفضلتي 💗";
+      if(count) count.textContent=saved.length+" منتج";
+      if(box){
+        box.innerHTML=saved.length
+          ?saved.map(favoriteCard).join("")
+          :'<div class="favorites-empty"><strong>مفضلتك تنتظرك هنا 💗</strong>ما عندك منتجات محفوظة حاليًا، اضغطي على قلب أي منتج عشان تضيفينه 🦋</div>';
+      }
+      updateFavoritesCount();
+      return;
+    }
+
+    const result=previousRender.apply(this,arguments);
+
+    // أضف/حدّث القلب حتى في بطاقات المنتجات المختارة أو المضافة بإضافات أخرى.
+    document.querySelectorAll("#products .product, #products .azal-new-card, #azalNewGrid .product, #azalNewGrid .azal-new-card").forEach(card=>{
+      const addButton=Array.from(card.querySelectorAll("button")).find(button=>
+        /addToCart\s*\(\s*\d+\s*\)/.test(button.getAttribute("onclick")||"")
+      );
+      if(!addButton) return;
+      const match=(addButton.getAttribute("onclick")||"").match(/addToCart\s*\(\s*(\d+)\s*\)/);
+      if(!match) return;
+      const id=Number(match[1]);
+      const image=card.querySelector(".product-image");
+      if(!image) return;
+      let heart=image.querySelector(".favorite-product");
+      if(!heart){
+        heart=document.createElement("button");
+        heart.type="button";
+        heart.className="heart favorite-product";
+        image.appendChild(heart);
+      }
+      const active=isFavorite(id);
+      heart.classList.toggle("is-active",active);
+      heart.textContent=active?"♥":"♡";
+      heart.setAttribute("aria-pressed",String(active));
+      heart.setAttribute("aria-label",active?"إزالة من المفضلة":"إضافة للمفضلة");
+      heart.onclick=function(){toggleFavorite(id);};
+    });
+    updateFavoritesCount();
+    return result;
+  };
+
+  toggleFavorite=function(id){
+    const key=String(id);
+    if(isFavorite(key)){
+      favorites=favorites.filter(item=>item!==key);
+      localStorage.setItem("azal_favorites",JSON.stringify(favorites));
+      updateFavoritesCount();
+      showToast("انشال المنتج من المفضلة 💗");
+    }else{
+      favorites.push(key);
+      localStorage.setItem("azal_favorites",JSON.stringify(favorites));
+      updateFavoritesCount();
+      showToast("منتجك يا حلوة صار بالمفضلة 💗🦋");
+    }
+    renderProducts();
+  };
+
+  openFavorites=function(){
+    showFavoritesOnly=true;
+    currentCategory="الكل";
+    const search=document.getElementById("search");
+    if(search) search.value="";
+    renderCategories();
+    renderProducts();
+    document.getElementById("productsSection")?.scrollIntoView({behavior:"smooth",block:"start"});
+  };
+
+  updateFavoritesCount();
+})();
+</script>
+<!-- END AZAL WISHLIST FIX 2026-11-06 -->
+
 </body>
 </html>

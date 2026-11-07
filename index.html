@@ -1278,31 +1278,51 @@ function goCategory(name){
   selectCategory(i<0?0:i);
 }
 
+function normalizeSearchText(value){
+  return String(value||"")
+    .toLocaleLowerCase()
+    .normalize("NFKC")
+    .replace(/[\\u064B-\\u065F\\u0670]/g,"")
+    .replace(/[أإآ]/g,"ا")
+    .replace(/ى/g,"ي")
+    .replace(/[ة]/g,"ه")
+    .replace(/[^\\p{L}\\p{N}]+/gu," ")
+    .trim();
+}
+
 function renderProducts(){
-  const q=document.getElementById("search").value.trim().toLowerCase();
+  const rawQuery=document.getElementById("search").value.trim();
+  const query=normalizeSearchText(rawQuery);
+  const terms=query.split(/\\s+/).filter(Boolean);
 
   const filtered=products.filter(p=>{
-    const categoryOK=
+    // البحث يتجاوز القسم المحدد حتى تظهر النتائج من كل المتجر.
+    const categoryOK=!!query ||
       currentCategory==="الكل" ||
       p.category===currentCategory;
 
-    const text=
-      `${p.name||""} ${p.description||""} ${p.category||""} ${p.subcategory||""}`
-      .toLowerCase();
+    const rawText=`${p.name||""} ${p.description||""} ${p.category||""} ${p.subcategory||""}`;
+    const englishText=typeof window.azalTranslateText==="function"
+      ? window.azalTranslateText(rawText)
+      : "";
+    const searchable=normalizeSearchText(rawText+" "+englishText);
 
-    return categoryOK && (!q||text.includes(q));
+    return categoryOK && (!terms.length || terms.every(term=>searchable.includes(term)));
   });
 
   document.getElementById("productsTitle").textContent=
-    currentCategory==="الكل"?"كل المنتجات":currentCategory;
+    query ? "Search Results" :
+    currentCategory==="الكل"?"All Products":currentCategory;
 
   document.getElementById("productsCount").textContent=
-    `${filtered.length} منتج`;
+    `${filtered.length} products`;
 
   const box=document.getElementById("products");
 
   if(!filtered.length){
-    box.innerHTML='<div class="empty">ما فيه منتجات بهذا القسم حاليًا 🤍</div>';
+    box.innerHTML=query
+      ? '<div class="empty">No products found. Try another search.</div>'
+      : '<div class="empty">No products are currently available in this category.</div>';
     return;
   }
 
@@ -5977,6 +5997,7 @@ const newest = products
     for (const [ar,en] of entries) out = out.split(ar).join(en);
     return out;
   }
+  window.azalTranslateText = translateText;
   function translateNode(node){
     if(node.nodeType === Node.TEXT_NODE){
       const next = translateText(node.nodeValue);
